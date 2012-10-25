@@ -1,0 +1,12 @@
+module options = "commander"
+
+export function run(argv) {
+  if (! argv)
+    argv = process.argv;
+
+  options.version("0.0.1")
+         .usage("[options] <file ...>")
+         .option("-v, --verbose", "increase verbosity")
+         .parse(argv)
+
+}

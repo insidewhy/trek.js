@@ -1,0 +1,30 @@
+{
+  "name":    "trek.js",
+  "description": "A parser and AST builder based on the TPEG variant of PEGs.",
+  "author": {
+    "name":   "James Pike",
+    "email":  "npm@chilon.net",
+    "web":    "http://chilon.net"
+  },
+  "version": "0.0.0",
+  "dependencies": {
+    "six-jpike": "0.0.10",
+    "commander": "1.0.5"
+  },
+  "licenses": [
+    { "type": "MIT" }
+  ],
+  "engines": {
+    "node": ">=0.4.0"
+  },
+  "scripts": {
+    "test":    "npm install && cake test"
+  },
+  "directories": {
+    "lib": "./lib"
+  },
+  "main": "./trek.js",
+  "scripts": {
+    "test": "six node_modules/mocha/bin/mocha"
+  }
+}
