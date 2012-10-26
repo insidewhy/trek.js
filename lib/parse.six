@@ -1,2 +1,18 @@
-export function parse() {
+export function char() {
 }
+
+export function star() {
+}
+
+export function plus() {
+}
+
+export function range() {
+}
+
+export function lexeme() {
+}
+
+export function or() {
+}
+

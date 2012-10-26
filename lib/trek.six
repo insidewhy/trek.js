@@ -1,3 +1,4 @@
 module fs = 'fs'
 
 export module command = './command'
+export module parse = './parse'
