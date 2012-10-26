@@ -27,7 +27,7 @@ var idFirst = p.or("_", "$", p.range("az")),
 // to match in between elements and stores an array of the contents.
 var manyIdentifiers = p.plus(identifier)
 
-var ast = parser.parse("hello totoro    friend", manyIdentifiers)
+var ast = parser.parse(manyIdentifiers, "hello totoro    friend")
 // ast now contains ["hello", "totoro", "friend"]
 ```
 

@@ -16,3 +16,18 @@ export function lexeme() {
 export function or() {
 }
 
+class Parser {
+  constructor(spacing) {
+    this.spacing = spacing
+  }
+
+  parse(grammar, source) {
+    // TODO:
+    return null
+  }
+}
+
+export var parser = spacing => new Parser(spacing)
+
+export var parse = (spacing, grammar, src) =>
+  parser(spacing).parse(grammar, src)

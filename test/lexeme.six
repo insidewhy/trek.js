@@ -1,4 +1,16 @@
-var expect = require("chai").expect;
+import expect from "chai"
+import {parse: p} from "../trek"
+
+var spacing = p.plus(" "),
+    parse   = (grammar, src) => p.parse(spacing, grammar, src)
 
 describe("lexeme", () => {
+  // too early for testing, just using this for now
+  it("parses many character ranges to form a string.", () => {
+    var grammar = p.plus(p.range("az")),
+        ast     = parse(grammar, "totoro")
+
+    // TODO: test ast
+    console.log(ast)
+  })
 })
