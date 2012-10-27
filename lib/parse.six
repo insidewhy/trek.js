@@ -1,3 +1,73 @@
+////////////////////////////////////////////////////////////////////////////
+// base parse classes
+class Range {
+  constructor(stream) { this.begin = stream.idx }
+  end(stream) {
+    this.end = stream.idx
+    // this.value = stream.source.substring(this.begin, this.end)
+    this.value = stream.source.substring(this.begin, this.end)
+    return this
+  }
+  toString() {
+    return "Range(" + this.value + ")"
+  }
+}
+
+class StoresChar {
+  constructor() {
+    this.storesChar = true
+  }
+
+  skip(stream) {
+    if (! this.match(stream))
+      return false
+    stream.inc()
+    return true
+  }
+}
+
+class ParseRange extends StoresChar {
+  constructor(range) {
+    super()
+    this.from = range[0]
+    this.to = range[1]
+  }
+
+  match(stream) {
+    return stream.front >= this.from && stream.front <= this.to
+  }
+}
+
+class ParseMany {
+  constructor(atLeastOne) {
+    this.atLeastOne = atLeastOne
+  }
+}
+
+class ParseManyChar {
+  constructor(atLeastOne, child) {
+    this.atLeastOne = atLeastOne
+    this.child = child
+  }
+
+  skip(stream) {
+    if (! this.child.skip(stream))
+      return this.atLeastOne
+    while (this.child.skip(stream)) {}
+    return true
+  }
+
+  parse(stream) {
+    var ret = new Range(stream)
+    if (this.skip(stream))
+      return ret.end(stream)
+    else
+      return null
+  }
+}
+
+////////////////////////////////////////////////////////////////////////////
+// public factory functions
 export function char() {
 }
 
@@ -5,9 +75,13 @@ export function star() {
 }
 
 export function plus() {
+  var subp = arguments[0]
+  return subp.storesChar ?
+    new ParseManyChar(true, subp) : new ParseMany(true, subp)
 }
 
 export function range() {
+  return new ParseRange(arguments[0])
 }
 
 export function lexeme() {
@@ -16,18 +90,32 @@ export function lexeme() {
 export function or() {
 }
 
-class Parser {
+class Stream {
   constructor(spacing) {
     this.spacing = spacing
   }
 
+  inc() { ++this.idx }
+
+  get front() { return this.source[this.idx] }
+
   parse(grammar, source) {
-    // TODO:
-    return null
+    this.idx = 0
+    this.source = source
+
+    // TODO: first skip whitepace
+
+    // parse grammar
+    var ast = grammar.parse(this)
+
+    // TODO: skip whitespace
+    // TODO: confirm is at end
+
+    return ast
   }
 }
 
-export var parser = spacing => new Parser(spacing)
+export var stream = spacing => new Stream(spacing)
 
 export var parse = (spacing, grammar, src) =>
-  parser(spacing).parse(grammar, src)
+  stream(spacing).parse(grammar, src)

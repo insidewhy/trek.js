@@ -10,7 +10,6 @@ describe("lexeme", () => {
     var grammar = p.plus(p.range("az")),
         ast     = parse(grammar, "totoro")
 
-    // TODO: test ast
-    console.log(ast)
+    expect(ast.value).to.equal("totoro")
   })
 })
