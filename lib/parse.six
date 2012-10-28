@@ -1,5 +1,13 @@
 module _ = 'underscore'
 
+import stream from './parse/stream'
+import {makeSeq, sequence} from './parse/sequence'
+
+//////////////////////////////////////////////////////////////////////////////
+// re-export stuff
+export var stream = stream,
+           sequence = sequence
+
 // Flags for parsers
 //    constant = true        -> what parser skips is always the same
 //    stores   = char/String -> only for char/String storing parsers
@@ -23,7 +31,7 @@ class StoresChar {
   skip(stream) {
     if (! this.match(stream))
       return false
-    stream.inc()
+    ++stream.idx
     return true
   }
 }
@@ -237,18 +245,6 @@ class ParseMember {
 }
 
 ////////////////////////////////////////////////////////////////////////////
-// helper function
-function makeSeq(args, offset) {
-  if (! offset)
-    offset = 0
-
-  if (offset + 1 === args.length)
-    return args[offset]
-  else
-    return sequence.apply(this, [].slice.call(args, offset))
-}
-
-////////////////////////////////////////////////////////////////////////////
 // public factory functions
 
 // Makes any parser act like a char parser such that it will be combined
@@ -327,44 +323,6 @@ export function member() {
   var name   = arguments[0]
   return new ParseMember(name, makeSeq(arguments, 1))
 }
-
-//////////////////////////////////////////////////////////////////////////////
-// stream stuff
-class Stream {
-  constructor(spacing) {
-    this.spacing = spacing
-  }
-
-  inc() { ++this.idx }
-
-  from(idx) {
-    return this.source.substring(idx, this.idx)
-  }
-
-  get front() { return this.source[this.idx] }
-
-  get empty() { return this.idx >= this.source.length }
-
-  skipWhitespace() {
-    this.spacing.skip(this)
-  }
-
-  parse(grammar, source) {
-    this.idx = 0
-    this.source = source
-
-    this.skipWhitespace()
-
-    // parse grammar
-    var ast = grammar.parse(this)
-
-    this.skipWhitespace()
-
-    return ast
-  }
-}
-
-export var stream = spacing => new Stream(spacing)
 
 export var parse = (spacing, grammar, src) =>
   stream(spacing).parse(grammar, src)

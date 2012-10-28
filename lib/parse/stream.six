@@ -1,0 +1,35 @@
+class Stream {
+  constructor(spacing) {
+    this.spacing = spacing
+  }
+
+  inc() { ++this.idx }
+
+  from(idx) {
+    return this.source.substring(idx, this.idx)
+  }
+
+  get front() { return this.source[this.idx] }
+
+  get empty() { return this.idx >= this.source.length }
+
+  skipWhitespace() {
+    this.spacing.skip(this)
+  }
+
+  parse(grammar, source) {
+    this.idx = 0
+    this.source = source
+
+    this.skipWhitespace()
+
+    // parse grammar
+    var ast = grammar.parse(this)
+
+    this.skipWhitespace()
+
+    return ast
+  }
+}
+
+export var stream = spacing => new Stream(spacing)

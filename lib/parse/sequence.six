@@ -1,0 +1,13 @@
+export function makeSeq(args, offset) {
+  if (! offset)
+    offset = 0
+
+  if (offset + 1 === args.length)
+    return args[offset]
+  else
+    return sequence.apply(this, [].slice.call(args, offset))
+}
+
+export function sequence() {
+  // TODO:
+}
