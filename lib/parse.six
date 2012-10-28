@@ -14,7 +14,7 @@ class StoresChar {
   parse(stream) {
     if (this.match(stream)) {
       var front = stream.front
-      ++this.idx
+      ++stream.idx
       return front
     }
     else return null
@@ -98,9 +98,39 @@ class ParseNotChar extends StoresChar {
   match(stream) { return -1 === this.chars.indexOf(stream.front) }
 }
 
+class ParseChar extends StoresChar {
+  constructor(chars) {
+    super()
+    this.chars = chars
+  }
+
+  match(stream) { return -1 !== this.chars.indexOf(stream.front) }
+}
+
 class ParseMany {
-  constructor(atLeastOne) {
+  constructor(atLeastOne, parser) {
     this.atLeastOne = atLeastOne
+    this.parser = parser
+  }
+
+  parse(stream) {
+    var ret = [],
+        ast = this.parser.parse(stream)
+
+    if (! ast)
+      return this.atLeastOne ? null : []
+
+    ret.push(ast)
+    stream.skipWhitespace()
+    if (stream.empty) return ret
+
+    while (ast = this.parser.parse(stream)) {
+      ret.push(ast)
+      stream.skipWhitespace()
+      if (stream.empty) return ret
+    }
+
+    return ret
   }
 }
 
@@ -112,9 +142,10 @@ class ParseManyChar extends StoresString {
   }
 
   skip(stream) {
-    if (! this.parser.skip(stream))
-      return this.atLeastOne
-    while (this.parser.skip(stream)) {}
+    if (stream.empty || ! this.parser.skip(stream))
+      return ! this.atLeastOne
+
+    while (! stream.empty && this.parser.skip(stream)) {}
     return true
   }
 }
@@ -153,9 +184,10 @@ class ParseOr {
     for (var i = 0; i < this.choices.length; ++i) {
       if (ast = this.choices[i].parse(stream))
         return ast
+
+      stream.idx = first
     }
 
-    stream.idx = first
     return null
   }
 
@@ -210,7 +242,10 @@ function makeSeq(args, offset) {
 
 // Makes any parser act like a char parser such that it will be combined
 // into ranges by parent parsers as if it was storing only a single character.
-export function char() {
+export function char(chars) {
+  if (typeof chars === "string")
+    return new ParseChar(chars)
+
   var parser = makeSeq(arguments)
   parser.stores = char
   return parser
@@ -292,10 +327,16 @@ class Stream {
   inc() { ++this.idx }
 
   from(idx) {
-    return this.source.substring(idx, this.idx - idx)
+    return this.source.substring(idx, this.idx)
   }
 
   get front() { return this.source[this.idx] }
+
+  get empty() { return this.idx >= this.source.length }
+
+  skipWhitespace() {
+    this.spacing.skip(this)
+  }
 
   parse(grammar, source) {
     this.idx = 0
