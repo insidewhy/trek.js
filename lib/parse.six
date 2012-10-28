@@ -1,21 +1,8 @@
 ////////////////////////////////////////////////////////////////////////////
 // base parse classes
-class Range {
-  constructor(stream) { this.begin = stream.idx }
-  end(stream) {
-    this.end = stream.idx
-    // this.value = stream.source.substring(this.begin, this.end)
-    this.value = stream.source.substring(this.begin, this.end)
-    return this
-  }
-  toString() {
-    return "Range(" + this.value + ")"
-  }
-}
-
 class StoresChar {
   constructor() {
-    this.storesChar = true
+    this.stores = char
   }
 
   skip(stream) {
@@ -26,6 +13,20 @@ class StoresChar {
   }
 }
 
+class Node {
+  constructor(stream, type) {
+    this.range = [ stream.idx ]
+    this.type = type
+  }
+
+  end(stream) {
+    this.range.push(stream.idx)
+    return this
+  }
+}
+
+//////////////////////////////////////////////////////////////////////////////
+// Parse classes
 class ParseRange extends StoresChar {
   constructor(range) {
     super()
@@ -45,43 +46,97 @@ class ParseMany {
 }
 
 class ParseManyChar {
-  constructor(atLeastOne, child) {
+  constructor(atLeastOne, parser) {
+    this.stores = String
     this.atLeastOne = atLeastOne
-    this.child = child
+    this.parser = parser
   }
 
   skip(stream) {
-    if (! this.child.skip(stream))
+    if (! this.parser.skip(stream))
       return this.atLeastOne
-    while (this.child.skip(stream)) {}
+    while (this.parser.skip(stream)) {}
     return true
   }
 
   parse(stream) {
-    var ret = new Range(stream)
+    var first = stream.idx
     if (this.skip(stream))
-      return ret.end(stream)
+      return stream.from(first)
     else
       return null
   }
 }
 
+//////////////////////////////////////////////////////////////////////////////
+// node parsers
+class ParseNode {
+  constructor(type, parser) {
+    this.type = type
+    this.parser = parser
+  }
+
+  parse(stream) {
+    var node = new Node(stream, this.type),
+        backup = stream.node
+
+    stream.node = node
+    var ret = this.parser.parse(stream)
+    stream.node = backup
+
+    return ret && node.end(stream)
+  }
+}
+
+class ParseMember {
+  constructor(name, parser) {
+    this.name = name
+    this.parser = parser
+  }
+
+  parse(stream) {
+    var ast = this.parser.parse(stream)
+    return ast && (stream.node[this.name] = ast)
+  }
+}
+
+////////////////////////////////////////////////////////////////////////////
+// helper function
+function makeSeq(args, offset) {
+  if (! offset)
+    offset = 0
+
+  if (offset + 1 == args.length)
+    return args[offset]
+  else
+    return sequence.apply(this, [].slice.call(args, offset))
+}
+
 ////////////////////////////////////////////////////////////////////////////
 // public factory functions
+
+// Makes any parser act like a char parser such that it will be combined
+// into ranges by parent parsers as if it was storing only a single character.
 export function char() {
+  var parser = makeSeq(arguments)
+  parser.stores = char
+  return parser
 }
 
-export function star() {
+// Parse any character that falls in between two other characters inclusive.
+export function range(charRange) {
+  return new ParseRange(charRange)
 }
 
-export function plus() {
-  var subp = arguments[0]
-  return subp.storesChar ?
-    new ParseManyChar(true, subp) : new ParseMany(true, subp)
-}
+export function star() { return many(false, makeSeq(arguments)) }
+export function plus() { return many(true, makeSeq(arguments)) }
 
-export function range() {
-  return new ParseRange(arguments[0])
+export function many() {
+  var atLeastOne = arguments[0],
+      parser     = makeSeq(arguments, 1)
+
+  return parser.stores === char ?
+    new ParseManyChar(atLeastOne, parser) : new ParseMany(atLeastOne, parser)
 }
 
 export function lexeme() {
@@ -90,12 +145,30 @@ export function lexeme() {
 export function or() {
 }
 
+//////////////////////////////////////////////////////////////////////////////
+// node stuff
+export function node() {
+  var type   = arguments[0]
+  return new ParseNode(type, makeSeq(arguments, 1))
+}
+
+export function member() {
+  var name   = arguments[0]
+  return new ParseMember(name, makeSeq(arguments, 1))
+}
+
+//////////////////////////////////////////////////////////////////////////////
+// stream stuff
 class Stream {
   constructor(spacing) {
     this.spacing = spacing
   }
 
   inc() { ++this.idx }
+
+  from(idx) {
+    return this.source.substring(idx, this.idx - idx)
+  }
 
   get front() { return this.source[this.idx] }
 

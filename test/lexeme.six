@@ -10,6 +10,14 @@ describe("lexeme", () => {
     var grammar = p.plus(p.range("az")),
         ast     = parse(grammar, "totoro")
 
-    expect(ast.value).to.equal("totoro")
+    expect(ast).to.equal("totoro")
+  })
+
+  it("parses a lexeme into a node with range information.", () => {
+    var grammar = p.node("Friend", p.member("name", p.plus(p.range("az")))),
+        ast     = parse(grammar, "totoro")
+
+    expect(ast.name).to.equal("totoro")
+    expect(ast.type).to.equal("Friend")
   })
 })
