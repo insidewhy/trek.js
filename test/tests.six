@@ -8,6 +8,13 @@ describe("lexeme", () => {
 
     expect(ast).to.equal("totoro")
   })
+
+  it("skips two constants to form a lexeme.", () => {
+    var grammar = p.lexeme(p.range("az"), p.range("az")),
+        ast     = parse(grammar, "mh")
+
+    expect(ast).to.equal("mh")
+  })
 })
 
 describe("node parsing", () => {

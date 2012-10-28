@@ -1,3 +1,5 @@
+module _ = 'underscore'
+
 ////////////////////////////////////////////////////////////////////////////
 // base parse classes
 class StoresChar {
@@ -20,10 +22,13 @@ class StoresString {
 
   parse(stream) {
     var first = stream.idx
-    if (this.skip(stream))
+    if (this.skip(stream)) {
       return stream.from(first)
-    else
+    }
+    else {
+      stream.idx = first
       return null
+    }
   }
 }
 
@@ -36,6 +41,25 @@ class Node {
   end(stream) {
     this.range.push(stream.idx)
     return this
+  }
+}
+
+//////////////////////////////////////////////////////////////////////////////
+// Skip classes
+class SkipString extends StoresString {
+  constructor() {
+    super()
+    this.skips = true
+    this.parsers = []
+  }
+
+  skip(stream) {
+    var first = stream.idx
+    if (_.find(this.parsers, p => ! p.skip(stream))) {
+      stream.idx = first
+      return false
+    }
+    return true
   }
 }
 
@@ -149,14 +173,34 @@ export function lexeme() {
   var parser, parsers = [].slice.call(arguments, 0)
 
   var canBeJoined = p => p.stores === char || p.stores === String
+  var skipper
+
+  var lexParsers = []
 
   // try to join string/char storing parsers together into longer
   // string storing parsers
   for (var i = 0; i < parsers.length - 1; ++i) {
     parser = parsers[i]
     if (canBeJoined(parser) && canBeJoined(parsers[i + 1])) {
+      parsers[i] = skipper = new SkipString()
+      skipper.parsers.push(parser)
+      skipper.parsers.push(parsers[i + 1])
+
+      parsers.splice(++i, 1)
+
+      while (i < parsers.length) {
+        parser = parsers[i]
+        if (! canBeJoined(parser))
+          break
+
+        skipper.parsers.push(parser)
+        parsers.shift()
+      }
     }
   }
+
+  // TODO: return parser that parses all components of lexeme in a row
+  return parsers[0]
 }
 
 export function or() {
