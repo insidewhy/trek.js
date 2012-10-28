@@ -13,6 +13,20 @@ class StoresChar {
   }
 }
 
+class StoresString {
+  constructor() {
+    this.stores = String
+  }
+
+  parse(stream) {
+    var first = stream.idx
+    if (this.skip(stream))
+      return stream.from(first)
+    else
+      return null
+  }
+}
+
 class Node {
   constructor(stream, type) {
     this.range = [ stream.idx ]
@@ -45,9 +59,9 @@ class ParseMany {
   }
 }
 
-class ParseManyChar {
+class ParseManyChar extends StoresString {
   constructor(atLeastOne, parser) {
-    this.stores = String
+    super()
     this.atLeastOne = atLeastOne
     this.parser = parser
   }
@@ -57,14 +71,6 @@ class ParseManyChar {
       return this.atLeastOne
     while (this.parser.skip(stream)) {}
     return true
-  }
-
-  parse(stream) {
-    var first = stream.idx
-    if (this.skip(stream))
-      return stream.from(first)
-    else
-      return null
   }
 }
 
@@ -140,6 +146,17 @@ export function many() {
 }
 
 export function lexeme() {
+  var parser, parsers = [].slice.call(arguments, 0)
+
+  var canBeJoined = p => p.stores === char || p.stores === String
+
+  // try to join string/char storing parsers together into longer
+  // string storing parsers
+  for (var i = 0; i < parsers.length - 1; ++i) {
+    parser = parsers[i]
+    if (canBeJoined(parser) && canBeJoined(parsers[i + 1])) {
+    }
+  }
 }
 
 export function or() {

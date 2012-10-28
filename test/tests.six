@@ -1,8 +1,4 @@
-import expect from "chai"
-import {parse: p} from "../trek"
-
-var spacing = p.plus(" "),
-    parse   = (grammar, src) => p.parse(spacing, grammar, src)
+import {expect, p, parse} from "./helper"
 
 describe("lexeme", () => {
   // too early for testing, just using this for now
@@ -12,8 +8,10 @@ describe("lexeme", () => {
 
     expect(ast).to.equal("totoro")
   })
+})
 
-  it("parses a lexeme into a node with range information.", () => {
+describe("node parsing", () => {
+  it("parses into a node with range information.", () => {
     var grammar = p.node("Friend", p.member("name", p.plus(p.range("az")))),
         ast     = parse(grammar, "totoro")
 
