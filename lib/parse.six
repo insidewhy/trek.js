@@ -178,6 +178,17 @@ class ParseOr {
       this.stores = stores
   }
 
+  skip(stream) {
+    var first = stream.idx
+
+    for (var i = 0; i < this.choices.length; ++i) {
+      if (this.choices[i].skip(stream))
+        return true
+    }
+
+    return false
+  }
+
   parse(stream) {
     var ast, first = stream.idx
 
@@ -342,13 +353,12 @@ class Stream {
     this.idx = 0
     this.source = source
 
-    // TODO: first skip whitepace
+    this.skipWhitespace()
 
     // parse grammar
     var ast = grammar.parse(this)
 
-    // TODO: skip whitespace
-    // TODO: confirm is at end
+    this.skipWhitespace()
 
     return ast
   }
