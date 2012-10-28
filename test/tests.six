@@ -24,12 +24,17 @@ describe("lexeme", () => {
 })
 
 describe("or parser", () => {
-  it("using or() over many character storing parsers acts as a parser", () => {
+  it("using or() over many char storing parsers, stores a char", () => {
     var grammar = p.or(p.notChar("03"), p.notChar("69")),
         ast     = parse(grammar, "5")
+  })
 
-    expect(grammar.stores).to.equal(p.char)
-    expect(ast).to.equal("5")
+  it("using or() over String and char storing parsers stores a String", () => {
+    var grammar = p.or(p.range("AZ"), p.plus(p.range("az")))
+    expect(grammar.stores).to.equal(String)
+
+    expect(parse(grammar, "Allo")).to.equal("A")
+    expect(parse(grammar, "alloFriend")).to.equal("allo")
   })
 })
 
