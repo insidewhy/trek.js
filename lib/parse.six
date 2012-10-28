@@ -1,10 +1,23 @@
 module _ = 'underscore'
 
+// Flags for parsers
+//    constant = true        -> what parser skips is always the same
+//    stores   = char/String -> only for char/String storing parsers
+
 ////////////////////////////////////////////////////////////////////////////
 // base parse classes
 class StoresChar {
   constructor() {
     this.stores = char
+  }
+
+  parse(stream) {
+    if (this.match(stream)) {
+      var front = stream.front
+      ++this.idx
+      return front
+    }
+    else return null
   }
 
   skip(stream) {
@@ -22,16 +35,16 @@ class StoresString {
 
   parse(stream) {
     var first = stream.idx
-    if (this.skip(stream)) {
+    if (this.skip(stream))
       return stream.from(first)
-    }
-    else {
-      stream.idx = first
-      return null
-    }
+
+    stream.idx = first
+    return null
   }
 }
 
+// A node is a special type of AST element that can't be broken down by
+// grammar rules. It may include range information.
 class Node {
   constructor(stream, type) {
     this.range = [ stream.idx ]
@@ -46,10 +59,9 @@ class Node {
 
 //////////////////////////////////////////////////////////////////////////////
 // Skip classes
-class SkipString extends StoresString {
+class ParseString extends StoresString {
   constructor() {
     super()
-    this.skips = true
     this.parsers = []
   }
 
@@ -77,6 +89,15 @@ class ParseRange extends StoresChar {
   }
 }
 
+class ParseNotChar extends StoresChar {
+  constructor(chars) {
+    super()
+    this.chars = chars
+  }
+
+  match(stream) { return -1 === this.chars.indexOf(stream.front) }
+}
+
 class ParseMany {
   constructor(atLeastOne) {
     this.atLeastOne = atLeastOne
@@ -96,6 +117,48 @@ class ParseManyChar extends StoresString {
     while (this.parser.skip(stream)) {}
     return true
   }
+}
+
+class ParseOr {
+  constructor(choices) {
+    this.choices = choices
+
+    // if all subparsers store character storing parsers
+    //   stores = char
+    // else if all subparsers store character or string storing parsers
+    //   stores = string
+    // else
+    //   no stores
+    var stores = null
+
+    var hasNonCharStr = _.find(choices, p => {
+      if (! p.stores) {
+        stores = null
+        return true
+      }
+
+      if (p.stores === String)
+        stores = String
+      else
+        stores = char
+    })
+
+    if (stores)
+      this.stores = stores
+  }
+
+  parse(stream) {
+    var ast, first = stream.idx
+
+    for (var i = 0; i < this.choices.length; ++i) {
+      if (ast = this.choices[i].parse(stream))
+        return ast
+    }
+
+    stream.idx = first
+    return null
+  }
+
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -136,7 +199,7 @@ function makeSeq(args, offset) {
   if (! offset)
     offset = 0
 
-  if (offset + 1 == args.length)
+  if (offset + 1 === args.length)
     return args[offset]
   else
     return sequence.apply(this, [].slice.call(args, offset))
@@ -154,9 +217,10 @@ export function char() {
 }
 
 // Parse any character that falls in between two other characters inclusive.
-export function range(charRange) {
-  return new ParseRange(charRange)
-}
+export function range(charRange) { return new ParseRange(charRange) }
+
+// Parse any character not in "chars".
+export function notChar(chars) { return new ParseNotChar(chars) }
 
 export function star() { return many(false, makeSeq(arguments)) }
 export function plus() { return many(true, makeSeq(arguments)) }
@@ -170,19 +234,19 @@ export function many() {
 }
 
 export function lexeme() {
-  var parser, parsers = [].slice.call(arguments, 0)
-
-  var canBeJoined = p => p.stores === char || p.stores === String
-  var skipper
-
-  var lexParsers = []
+  var parser,
+      parsers = [].slice.call(arguments, 0),
+      canBeJoined =
+        p => !p.constant && (p.stores === char || p.stores === String),
+      skipper,
+      lexParsers = []
 
   // try to join string/char storing parsers together into longer
   // string storing parsers
   for (var i = 0; i < parsers.length - 1; ++i) {
     parser = parsers[i]
     if (canBeJoined(parser) && canBeJoined(parsers[i + 1])) {
-      parsers[i] = skipper = new SkipString()
+      parsers[i] = skipper = new ParseString()
       skipper.parsers.push(parser)
       skipper.parsers.push(parsers[i + 1])
 
@@ -194,16 +258,16 @@ export function lexeme() {
           break
 
         skipper.parsers.push(parser)
-        parsers.shift()
+        parsers.splice(i)
       }
     }
   }
 
-  // TODO: return parser that parses all components of lexeme in a row
-  return parsers[0]
+  return 1 === parsers.length ?  parsers[0] : new ParseLexeme(parsers)
 }
 
 export function or() {
+  return new ParseOr([].slice.call(arguments, 0))
 }
 
 //////////////////////////////////////////////////////////////////////////////

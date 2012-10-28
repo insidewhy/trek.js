@@ -1,6 +1,6 @@
 import {expect, p, parse} from "./helper"
 
-describe("lexeme", () => {
+describe("repetition parsers", () => {
   // too early for testing, just using this for now
   it("parses many character ranges to form a string.", () => {
     var grammar = p.plus(p.range("az")),
@@ -8,12 +8,28 @@ describe("lexeme", () => {
 
     expect(ast).to.equal("totoro")
   })
+})
 
-  it("skips two constants to form a lexeme.", () => {
-    var grammar = p.lexeme(p.range("az"), p.range("az")),
-        ast     = parse(grammar, "mh")
+describe("lexeme", () => {
+  it("skips several constants to form a string.", () => {
+    var grammar = p.lexeme(p.range("az"), p.notChar("_"), p.range("az")),
+        ast     = parse(grammar, "m!h")
 
-    expect(ast).to.equal("mh")
+    expect(ast).to.equal("m!h")
+  })
+
+  it("skips a character and a string to form a string.", () => {
+    // TODO:
+  })
+})
+
+describe("or parser", () => {
+  it("using or() over many character storing parsers acts as a parser", () => {
+    var grammar = p.or(p.notChar("03"), p.notChar("69")),
+        ast     = parse(grammar, "5")
+
+    expect(grammar.stores).to.equal(p.char)
+    expect(ast).to.equal("5")
   })
 })
 
