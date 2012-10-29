@@ -1,0 +1,73 @@
+import makeSeq from './sequence'
+
+class StoresChar {
+  constructor() {
+    this.stores = char
+  }
+
+  parse(stream) {
+    if (this.match(stream)) {
+      var front = stream.front
+      ++stream.idx
+      return front
+    }
+    else return null
+  }
+
+  skip(stream) {
+    if (! this.match(stream))
+      return false
+    ++stream.idx
+    return true
+  }
+}
+// TODO: export class StoresChar
+export StoresChar
+
+class ParseRange extends StoresChar {
+  constructor(range) {
+    super()
+    this.from = range[0]
+    this.to = range[1]
+  }
+
+  match(stream) {
+    return stream.front >= this.from && stream.front <= this.to
+  }
+}
+
+class ParseNotChar extends StoresChar {
+  constructor(chars) {
+    super()
+    this.chars = chars
+  }
+
+  match(stream) { return -1 === this.chars.indexOf(stream.front) }
+}
+
+class ParseChar extends StoresChar {
+  constructor(chars) {
+    super()
+    this.chars = chars
+  }
+
+  match(stream) { return -1 !== this.chars.indexOf(stream.front) }
+}
+
+// Parse any character that falls in between two other characters inclusive.
+export function range(charRange) { return new ParseRange(charRange) }
+
+// Parse any character not in "chars".
+export function notChar(chars) { return new ParseNotChar(chars) }
+
+// Makes any parser act like a char parser such that it will be combined
+// into ranges by parent parsers as if it was storing only a single character.
+export function char() {
+  var chars = arguments[0]
+  if (1 == arguments.length && typeof chars === "string")
+    return new ParseChar(chars)
+
+  var parser = makeSeq(arguments)
+  parser.stores = char
+  return parser
+}
