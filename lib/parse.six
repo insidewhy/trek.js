@@ -2,11 +2,14 @@ module _ = 'underscore'
 
 import stream from './parse/stream'
 import {makeSeq, sequence} from './parse/sequence'
+import {node, member} from './parse/node'
 
 //////////////////////////////////////////////////////////////////////////////
 // re-export stuff
-export var stream = stream,
-           sequence = sequence
+export var stream   = stream,
+           sequence = sequence,
+           node     = node,
+           member   = member
 
 // Flags for parsers
 //    constant = true        -> what parser skips is always the same
@@ -51,22 +54,6 @@ class StoresString {
   }
 }
 
-// A node is a special type of AST element that can't be broken down by
-// grammar rules. It may include range information.
-class Node {
-  constructor(stream, type) {
-    this.range = [ stream.idx ]
-    this.type = type
-  }
-
-  end(stream) {
-    this.range.push(stream.idx)
-    return this
-  }
-}
-
-//////////////////////////////////////////////////////////////////////////////
-// Skip classes
 class ParseString extends StoresString {
   constructor() {
     super()
@@ -212,38 +199,6 @@ class ParseOr {
 
 }
 
-//////////////////////////////////////////////////////////////////////////////
-// node parsers
-class ParseNode {
-  constructor(type, parser) {
-    this.type = type
-    this.parser = parser
-  }
-
-  parse(stream) {
-    var node = new Node(stream, this.type),
-        backup = stream.node
-
-    stream.node = node
-    var ret = this.parser.parse(stream)
-    stream.node = backup
-
-    return ret && node.end(stream)
-  }
-}
-
-class ParseMember {
-  constructor(name, parser) {
-    this.name = name
-    this.parser = parser
-  }
-
-  parse(stream) {
-    var ast = this.parser.parse(stream)
-    return ast && (stream.node[this.name] = ast)
-  }
-}
-
 ////////////////////////////////////////////////////////////////////////////
 // public factory functions
 
@@ -280,8 +235,7 @@ export function lexeme() {
       parsers = [].slice.call(arguments, 0),
       canBeJoined =
         p => !p.constant && (p.stores === char || p.stores === String),
-      skipper,
-      lexParsers = []
+      skipper
 
   // try to join string/char storing parsers together into longer
   // string storing parsers
@@ -310,18 +264,6 @@ export function lexeme() {
 
 export function or() {
   return new ParseOr([].slice.call(arguments, 0))
-}
-
-//////////////////////////////////////////////////////////////////////////////
-// node stuff
-export function node() {
-  var type   = arguments[0]
-  return new ParseNode(type, makeSeq(arguments, 1))
-}
-
-export function member() {
-  var name   = arguments[0]
-  return new ParseMember(name, makeSeq(arguments, 1))
 }
 
 export var parse = (spacing, grammar, src) =>
