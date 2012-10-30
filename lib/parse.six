@@ -151,17 +151,13 @@ class ParseOr {
 export function star() { return many(false, makeSeq(arguments)) }
 export function plus() { return many(true, makeSeq(arguments)) }
 
-export function many() {
-  var atLeastOne = arguments[0],
-      parser     = makeSeq(arguments, 1)
-
+function many(atLeastOne, parser) {
   return parser.stores === char ?
     new ParseManyChar(atLeastOne, parser) : new ParseMany(atLeastOne, parser)
 }
 
-export function lexeme() {
+export function lexeme(...parsers) {
   var parser,
-      parsers = [].slice.call(arguments, 0),
       canBeJoined =
         p => !p.constant && (p.stores === char || p.stores === String),
       skipper
@@ -191,8 +187,8 @@ export function lexeme() {
   return 1 === parsers.length ?  parsers[0] : new ParseLexeme(parsers)
 }
 
-export function or() {
-  return new ParseOr([].slice.call(arguments, 0))
+export function or(...choices) {
+  return new ParseOr(choices)
 }
 
 export var parse = (spacing, grammar, src) =>
