@@ -1,5 +1,5 @@
 module _ = 'underscore'
-import Char from './base'
+import Char from './char'
 
 class ParseOr {
   constructor(choices) {

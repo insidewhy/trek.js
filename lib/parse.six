@@ -1,17 +1,16 @@
 module _ = 'underscore'
 
 import stream from './parse/stream'
-import Char from './parse/base'
 import {sequence, lexeme} from './parse/sequence'
 import {node, member} from './parse/node'
-import {range, notChar, char} from './parse/char'
+import {range, notChar, char, Char} from './parse/char'
 import {plus, star} from './parse/repetition'
 import or from './parse/or'
 
 //////////////////////////////////////////////////////////////////////////////
 // re-export stuff
-export stream, Char, sequence, lexeme, node, member, range, notChar, char,
-       plus, star, or
+export stream, sequence, lexeme, node, member,
+       range, notChar, char, Char, plus, star, or
 
 // Flags for parsers
 //    constant = true        -> what parser skips is always the same

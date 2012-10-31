@@ -40,8 +40,8 @@ describe("lexeme", () => {
 
 describe("or parser", () => {
   it("using or() over many char storing parsers, stores a char", () => {
-    var grammar = p.or(p.notChar("03"), p.notChar("69")),
-        ast     = parse(grammar, "5")
+    var grammar = p.or(p.range("03"), p.char("a")),
+        ast     = parse(grammar, "a")
   })
 
   it("using or() over String and char storing parsers stores a String", () => {

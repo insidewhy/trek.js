@@ -1,4 +1,5 @@
-import {ParseString, Char} from './base'
+import Char from './char'
+import ParseString from './string'
 
 export function makeSeq(args, offset) {
   if (! offset)

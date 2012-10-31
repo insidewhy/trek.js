@@ -1,5 +1,29 @@
-import makeSeq from './sequence'
-import {StoresChar, Char} from './base'
+export var Char = 1
+
+// TODO: export classes directly - see https://github.com/ariya/esprima/pull/130
+class StoresChar {
+  constructor() {
+    this.stores = Char
+  }
+
+  parse(stream) {
+    if (this.match(stream)) {
+      var front = stream.front
+      ++stream.idx
+      return front
+    }
+    else return null
+  }
+
+  skip(stream) {
+    if (! this.match(stream))
+      return false
+    ++stream.idx
+    return true
+  }
+}
+
+export StoresChar
 
 class ParseRange extends StoresChar {
   constructor(range) {
@@ -39,12 +63,11 @@ export function notChar(chars) { return new ParseNotChar(chars) }
 
 // Makes any parser act like a char parser such that it will be combined
 // into ranges by parent parsers as if it was storing only a single character.
-export function char() {
-  var chars = arguments[0]
-  if (1 == arguments.length && typeof chars === "string")
+export function char(chars) {
+  if (typeof chars === "string")
     return new ParseChar(chars)
 
-  var parser = makeSeq(arguments)
-  parser.stores = Char
-  return parser
+  // chars is a parser, make it pretend it stores char
+  chars.stores = Char
+  return chars
 }

@@ -1,5 +1,6 @@
 import makeSeq from './sequence'
-import {StoresString, Char} from './base'
+import StoresString from './string'
+import Char from './char'
 
 class ParseMany {
   constructor(atLeastOne, parser) {

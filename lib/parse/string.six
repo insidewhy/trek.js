@@ -1,28 +1,4 @@
 module _ = 'underscore'
-export var Char = 1
-
-// TODO: export classes directly - see https://github.com/ariya/esprima/pull/130
-class StoresChar {
-  constructor() {
-    this.stores = Char
-  }
-
-  parse(stream) {
-    if (this.match(stream)) {
-      var front = stream.front
-      ++stream.idx
-      return front
-    }
-    else return null
-  }
-
-  skip(stream) {
-    if (! this.match(stream))
-      return false
-    ++stream.idx
-    return true
-  }
-}
 
 class StoresString {
   constructor() {
@@ -55,4 +31,4 @@ class ParseString extends StoresString {
   }
 }
 
-export StoresChar, StoresString, ParseString
+export StoresString, ParseString
