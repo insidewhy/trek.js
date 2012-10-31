@@ -1,10 +1,10 @@
 # trek.js
 
-A parser generator based on the TPEG variant of PEGs that can build a parser that stores text to an AST structure, both from a single grammar.
+A PEG parsing system in which the AST and parser are described by a single grammar. The constructed parser is then capable of populating the AST directly from source texts.
 
 # Example
 
-You can write parsers directly in JavaScript or in a shortened form:
+Parsers can be written using the JavaScript API or compiled from a shortened form.
 
 ```JavaScript
 // first create a parser
