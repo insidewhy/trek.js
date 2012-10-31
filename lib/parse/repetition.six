@@ -1,0 +1,53 @@
+import makeSeq from './sequence'
+import {StoresString, Char} from './base'
+
+class ParseMany {
+  constructor(atLeastOne, parser) {
+    this.atLeastOne = atLeastOne
+    this.parser = parser
+  }
+
+  parse(stream) {
+    var ret = [],
+        ast = this.parser.parse(stream)
+
+    if (! ast)
+      return this.atLeastOne ? null : []
+
+    ret.push(ast)
+    stream.skipWhitespace()
+    if (stream.empty) return ret
+
+    while (ast = this.parser.parse(stream)) {
+      ret.push(ast)
+      stream.skipWhitespace()
+      if (stream.empty) return ret
+    }
+
+    return ret
+  }
+}
+
+class ParseManyChar extends StoresString {
+  constructor(atLeastOne, parser) {
+    super()
+    this.atLeastOne = atLeastOne
+    this.parser = parser
+  }
+
+  skip(stream) {
+    if (stream.empty || ! this.parser.skip(stream))
+      return ! this.atLeastOne
+
+    while (! stream.empty && this.parser.skip(stream)) {}
+    return true
+  }
+}
+
+function many(atLeastOne, parser) {
+  return parser.stores === Char ?
+    new ParseManyChar(atLeastOne, parser) : new ParseMany(atLeastOne, parser)
+}
+
+export function star() { return many(false, makeSeq(arguments)) }
+export function plus() { return many(true, makeSeq(arguments)) }

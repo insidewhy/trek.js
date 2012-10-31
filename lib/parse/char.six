@@ -1,28 +1,5 @@
 import makeSeq from './sequence'
-
-class StoresChar {
-  constructor() {
-    this.stores = char
-  }
-
-  parse(stream) {
-    if (this.match(stream)) {
-      var front = stream.front
-      ++stream.idx
-      return front
-    }
-    else return null
-  }
-
-  skip(stream) {
-    if (! this.match(stream))
-      return false
-    ++stream.idx
-    return true
-  }
-}
-// TODO: export class StoresChar
-export StoresChar
+import {StoresChar, Char} from './base'
 
 class ParseRange extends StoresChar {
   constructor(range) {
@@ -68,6 +45,6 @@ export function char() {
     return new ParseChar(chars)
 
   var parser = makeSeq(arguments)
-  parser.stores = char
+  parser.stores = Char
   return parser
 }

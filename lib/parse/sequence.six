@@ -1,3 +1,5 @@
+import {ParseString, Char} from './base'
+
 export function makeSeq(args, offset) {
   if (! offset)
     offset = 0
@@ -6,6 +8,37 @@ export function makeSeq(args, offset) {
     return args[offset]
   else
     return sequence.apply(this, [].slice.call(args, offset))
+}
+
+export function lexeme(...parsers) {
+  var parser,
+      canBeJoined =
+        p => !p.constant && (p.stores === Char || p.stores === String),
+      skipper
+
+  // try to join string/char storing parsers together into longer
+  // string storing parsers
+  for (var i = 0; i < parsers.length - 1; ++i) {
+    parser = parsers[i]
+    if (canBeJoined(parser) && canBeJoined(parsers[i + 1])) {
+      parsers[i] = skipper = new ParseString()
+      skipper.parsers.push(parser)
+      skipper.parsers.push(parsers[i + 1])
+
+      parsers.splice(++i, 1)
+
+      while (i < parsers.length) {
+        parser = parsers[i]
+        if (! canBeJoined(parser))
+          break
+
+        skipper.parsers.push(parser)
+        parsers.splice(i)
+      }
+    }
+  }
+
+  return 1 === parsers.length ?  parsers[0] : new ParseLexeme(parsers)
 }
 
 export function sequence() {

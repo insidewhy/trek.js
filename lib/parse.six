@@ -1,13 +1,17 @@
 module _ = 'underscore'
 
 import stream from './parse/stream'
-import {makeSeq, sequence} from './parse/sequence'
+import Char from './parse/base'
+import {sequence, lexeme} from './parse/sequence'
 import {node, member} from './parse/node'
 import {range, notChar, char} from './parse/char'
+import {plus, star} from './parse/repetition'
+import or from './parse/or'
 
 //////////////////////////////////////////////////////////////////////////////
 // re-export stuff
-export stream, sequence, node, member, range, notChar, char
+export stream, Char, sequence, lexeme, node, member, range, notChar, char,
+       plus, star, or
 
 // Flags for parsers
 //    constant = true        -> what parser skips is always the same
@@ -15,181 +19,8 @@ export stream, sequence, node, member, range, notChar, char
 
 ////////////////////////////////////////////////////////////////////////////
 // base parse classes
-class StoresString {
-  constructor() {
-    this.stores = String
-  }
-
-  parse(stream) {
-    var first = stream.idx
-    if (this.skip(stream))
-      return stream.from(first)
-
-    stream.idx = first
-    return null
-  }
-}
-
-class ParseString extends StoresString {
-  constructor() {
-    super()
-    this.parsers = []
-  }
-
-  skip(stream) {
-    var first = stream.idx
-    if (_.find(this.parsers, p => ! p.skip(stream))) {
-      stream.idx = first
-      return false
-    }
-    return true
-  }
-}
-
 //////////////////////////////////////////////////////////////////////////////
 // Parse classes
-class ParseMany {
-  constructor(atLeastOne, parser) {
-    this.atLeastOne = atLeastOne
-    this.parser = parser
-  }
-
-  parse(stream) {
-    var ret = [],
-        ast = this.parser.parse(stream)
-
-    if (! ast)
-      return this.atLeastOne ? null : []
-
-    ret.push(ast)
-    stream.skipWhitespace()
-    if (stream.empty) return ret
-
-    while (ast = this.parser.parse(stream)) {
-      ret.push(ast)
-      stream.skipWhitespace()
-      if (stream.empty) return ret
-    }
-
-    return ret
-  }
-}
-
-class ParseManyChar extends StoresString {
-  constructor(atLeastOne, parser) {
-    super()
-    this.atLeastOne = atLeastOne
-    this.parser = parser
-  }
-
-  skip(stream) {
-    if (stream.empty || ! this.parser.skip(stream))
-      return ! this.atLeastOne
-
-    while (! stream.empty && this.parser.skip(stream)) {}
-    return true
-  }
-}
-
-class ParseOr {
-  constructor(choices) {
-    this.choices = choices
-
-    // if all subparsers store character storing parsers
-    //   stores = char
-    // else if all subparsers store character or string storing parsers
-    //   stores = string
-    // else
-    //   no stores
-    var stores = null
-
-    var hasNonCharStr = _.find(choices, p => {
-      if (! p.stores) {
-        stores = null
-        return true
-      }
-
-      if (p.stores === String)
-        stores = String
-      else
-        stores = char
-    })
-
-    if (stores)
-      this.stores = stores
-  }
-
-  skip(stream) {
-    var first = stream.idx
-
-    for (var i = 0; i < this.choices.length; ++i) {
-      if (this.choices[i].skip(stream))
-        return true
-    }
-
-    return false
-  }
-
-  parse(stream) {
-    var ast, first = stream.idx
-
-    for (var i = 0; i < this.choices.length; ++i) {
-      if (ast = this.choices[i].parse(stream))
-        return ast
-
-      stream.idx = first
-    }
-
-    return null
-  }
-
-}
-
-////////////////////////////////////////////////////////////////////////////
-// public factory functions
-
-export function star() { return many(false, makeSeq(arguments)) }
-export function plus() { return many(true, makeSeq(arguments)) }
-
-function many(atLeastOne, parser) {
-  return parser.stores === char ?
-    new ParseManyChar(atLeastOne, parser) : new ParseMany(atLeastOne, parser)
-}
-
-export function lexeme(...parsers) {
-  var parser,
-      canBeJoined =
-        p => !p.constant && (p.stores === char || p.stores === String),
-      skipper
-
-  // try to join string/char storing parsers together into longer
-  // string storing parsers
-  for (var i = 0; i < parsers.length - 1; ++i) {
-    parser = parsers[i]
-    if (canBeJoined(parser) && canBeJoined(parsers[i + 1])) {
-      parsers[i] = skipper = new ParseString()
-      skipper.parsers.push(parser)
-      skipper.parsers.push(parsers[i + 1])
-
-      parsers.splice(++i, 1)
-
-      while (i < parsers.length) {
-        parser = parsers[i]
-        if (! canBeJoined(parser))
-          break
-
-        skipper.parsers.push(parser)
-        parsers.splice(i)
-      }
-    }
-  }
-
-  return 1 === parsers.length ?  parsers[0] : new ParseLexeme(parsers)
-}
-
-export function or(...choices) {
-  return new ParseOr(choices)
-}
 
 export var parse = (spacing, grammar, src) =>
   stream(spacing).parse(grammar, src)
