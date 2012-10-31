@@ -19,14 +19,14 @@ describe("repetition parsers", () => {
 })
 
 describe("lexeme", () => {
-  it("skips several constants to form a string.", () => {
+  it("skips 3 characters to store a string.", () => {
     var grammar = p.lexeme(p.range("az"), p.notChar("_"), p.range("az")),
         ast     = parse(grammar, "m!h")
 
     expect(ast).to.equal("m!h")
   })
 
-  it("skips a character and a string to form a string.", () => {
+  it("skips a character and a string to store a string.", () => {
     var idFirst = p.or(p.range("az"), p.char("_$"))
     var grammar =
       p.plus(
@@ -52,8 +52,17 @@ describe("or parser", () => {
     expect(parsePartial(grammar, "alloFriend")).to.equal("allo")
   })
 
-  it("using or() with lexeme() to form an identifier", () => {
-    // TODO:
+  it("using or() over String and node parser to return varying type.", () => {
+    var grammar = p.or(
+      p.node("Friend", p.member("name", p.plus(p.range("az")))),
+      p.plus(p.range("09")))
+
+    expect(grammar.stores).to.equal(undefined)
+
+    var ast = parse(grammar, "sisko")
+    expect(ast.name).to.equal("sisko")
+    ast = parse(grammar, "420")
+    expect(ast).to.equal("420")
   })
 })
 
