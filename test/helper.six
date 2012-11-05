@@ -8,7 +8,10 @@ export var spacing = p.plus(p.char(" ")),
              var stream = p.stream(spacing),
                  ast    = stream.parse(grammar, src)
 
-             return stream.empty ? ast : null
+             if (! stream.empty)
+               throw Error("stream should be empty")
+
+             return ast
            },
            parsePartial = (grammar, src) => p.parse(spacing, grammar, src)
 

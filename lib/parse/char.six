@@ -23,7 +23,27 @@ class StoresChar {
   }
 }
 
-export StoresChar
+class ParseConstantChar {
+  constructor(ch) {
+    this.stores = Char
+    this.value = ch
+    this.isConstant = true
+  }
+
+  skip(stream) {
+    if (stream.front === this.value) {
+      ++stream.idx
+      return true
+    }
+    return false
+  }
+
+  parse(stream) {
+    return this.skip(stream) ? this.value : null
+  }
+}
+
+export StoresChar, ParseConstantChar
 
 class ParseRange extends StoresChar {
   constructor(range) {
@@ -64,8 +84,10 @@ export function notChar(chars) { return new ParseNotChar(chars) }
 // Makes any parser act like a char parser such that it will be combined
 // into ranges by parent parsers as if it was storing only a single character.
 export function char(chars) {
-  if (typeof chars === "string")
-    return new ParseChar(chars)
+  if (typeof chars === "string") {
+    return chars.length === 1 ?
+      new ParseConstantChar(chars) : new ParseChar(chars)
+  }
 
   // chars is a parser, make it pretend it stores char
   chars.stores = Char

@@ -1,5 +1,7 @@
 module _ = 'underscore'
 
+import ParseConstantChar from './char'
+
 class StoresString {
   constructor() {
     this.stores = String
@@ -31,4 +33,37 @@ class ParseString extends StoresString {
   }
 }
 
-export StoresString, ParseString
+class ParseConstant {
+  constructor(value) {
+    this.stores = String
+    this.value = value
+    this.isConstant = true
+  }
+
+  skip(stream) {
+    if (stream.length >= this.value.length &&
+      stream.substr(stream.idx, this.value.length) === this.value)
+    {
+      stream.idx += this.value.length
+      return true
+    }
+    else
+      return false
+  }
+
+  parse(stream) {
+    return this.skip(stream) ?  this.value : null
+  }
+}
+
+export StoresString, ParseString, ParseConstant
+
+// If obj is a string then return a constant parser, else return the
+// parser unchanged.
+export function makeParser(obj) {
+  if (typeof obj !== 'string')
+    return obj
+
+  return obj.length === 1 ?
+    new ParseConstantChar(obj) : new ParseConstant(obj)
+}

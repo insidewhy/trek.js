@@ -13,6 +13,10 @@ class Stream {
 
   get empty() { return this.idx >= this.source.length }
 
+  get length() { return this.source.length - this.idx }
+
+  substr(idx, length) { return this.source.substr(idx, length) }
+
   skipWhitespace() {
     this.spacing.skip(this)
   }

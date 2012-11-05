@@ -1,5 +1,6 @@
 module _ = 'underscore'
 import Char from './char'
+import makeParser from './string'
 
 class ParseOr {
   constructor(choices) {
@@ -56,6 +57,6 @@ class ParseOr {
 }
 
 export function or(...choices) {
-  return new ParseOr(choices)
+  return new ParseOr(choices.map(makeParser))
 }
 
