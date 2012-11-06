@@ -1,0 +1,11 @@
+import {expect, p, parse} from "./helper"
+
+describe("node parsing", () => {
+  it("parses into a node with range information.", () => {
+    var grammar = p.node("Friend", p.member("name", p.plus(p.range("az")))),
+        ast     = parse(grammar, "totoro")
+
+    expect(ast.name).to.equal("totoro")
+    expect(ast.type).to.equal("Friend")
+  })
+})

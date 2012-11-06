@@ -1,0 +1,23 @@
+import {expect, p, parse} from "./helper"
+
+
+describe("lexeme", () => {
+  it("skips 3 characters to store a string.", () => {
+    var grammar = p.lexeme(p.range("az"), p.notChar("_"), p.range("az")),
+        ast     = parse(grammar, "m!h")
+
+    expect(ast).to.equal("m!h")
+  })
+
+  it("skips a character and a string to store a string.", () => {
+    var idFirst = p.or(p.range("az"), p.char("_$"))
+    var grammar =
+      p.plus(
+        p.lexeme(idFirst, p.star(p.or(p.range("09"), idFirst))))
+
+    var ast     = parse(grammar, "_ident$ $ident0r")
+    expect(ast[0]).to.equal("_ident$")
+    expect(ast[1]).to.equal("$ident0r")
+  })
+})
+
