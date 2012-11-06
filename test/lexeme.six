@@ -19,5 +19,14 @@ describe("lexeme", () => {
     expect(ast[0]).to.equal("_ident$")
     expect(ast[1]).to.equal("$ident0r")
   })
+
+  it("skips a string, a constant and a string to return a list of two strings.", () => {
+
+    var grammar = p.lexeme(p.range("az"), ".", p.plus(p.range("az"))),
+        ast     = parse(grammar, "n.totoro")
+
+    expect(ast[0]).to.equal("n")
+    expect(ast[1]).to.equal("totoro")
+  })
 })
 

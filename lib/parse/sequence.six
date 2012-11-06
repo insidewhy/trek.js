@@ -1,5 +1,55 @@
 import Char from './char'
-import {ParseString, makeParser} from './string'
+import {ParseString, makeParser, StoresString} from './string'
+
+module _ = 'underscore'
+
+class SkipParsers extends StoresString {
+  constructor() {
+    super()
+    this.parsers = []
+    this.isConstant = true
+  }
+
+  skip(stream) {
+    var first = stream.idx
+    if (_.find(this.parsers, p => ! p.skip(stream))) {
+      stream.idx = first
+      return false
+    }
+    return true
+  }
+}
+
+class ParseLexeme {
+  constructor(parsers) {
+    this.parsers = parsers.map(p => {
+      if (p.isConstant) {
+        return (stream, ast) => p.skip(stream)
+      }
+      else {
+        return (stream, ast) => {
+          var ret
+          if (ret = p.parse(stream)) {
+            ast.push(ret)
+            return true
+          }
+          else return false
+        }
+      }
+    })
+  }
+
+  parse(stream) {
+    var first = stream.idx, ast = []
+    for (var idx in this.parsers) {
+      if (! this.parsers[idx](stream, ast)) {
+        stream.idx = first
+        return null
+      }
+    }
+    return ast.length === 1 ? ast[0] : ast
+  }
+}
 
 export function makeSeq(args, offset) {
   if (! offset)
@@ -22,7 +72,7 @@ export function lexeme(...parsers) {
   for (var i = 0; i < parsers.length - 1; ++i) {
     parser = parsers[i]
     if (canBeJoined(parser) && canBeJoined(parsers[i + 1])) {
-      parsers[i] = skipper = new ParseString()
+      parsers[i] = skipper = new SkipParsers()
       skipper.parsers.push(parser)
       skipper.parsers.push(parsers[i + 1])
 
@@ -36,6 +86,9 @@ export function lexeme(...parsers) {
         skipper.parsers.push(parser)
         parsers.splice(i)
       }
+    }
+    else {
+      parsers[i] = makeParser(parsers[i])
     }
   }
 

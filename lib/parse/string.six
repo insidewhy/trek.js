@@ -1,5 +1,3 @@
-module _ = 'underscore'
-
 import ParseConstantChar from './char'
 
 class StoresString {
@@ -14,22 +12,6 @@ class StoresString {
 
     stream.idx = first
     return null
-  }
-}
-
-class ParseString extends StoresString {
-  constructor() {
-    super()
-    this.parsers = []
-  }
-
-  skip(stream) {
-    var first = stream.idx
-    if (_.find(this.parsers, p => ! p.skip(stream))) {
-      stream.idx = first
-      return false
-    }
-    return true
   }
 }
 
@@ -56,7 +38,7 @@ class ParseConstant {
   }
 }
 
-export StoresString, ParseString, ParseConstant
+export StoresString, ParseConstant
 
 // If obj is a string then return a constant parser, else return the
 // parser unchanged.
