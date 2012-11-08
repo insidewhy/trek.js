@@ -1,4 +1,4 @@
-import {expect, p, parse} from "./helper"
+import {expect, p, parse, parsePartial} from "./helper"
 
 
 describe("lexeme", () => {
@@ -27,6 +27,8 @@ describe("lexeme", () => {
 
     expect(ast[0]).to.equal("n")
     expect(ast[1]).to.equal("totoro")
+
+    expect(parsePartial(grammar, "h .bear")).to.equal(null)
   })
 })
 

@@ -16,9 +16,8 @@ var p = require('trek.js').parse
 var comment = p.lexeme("//", p.star(p.notChar("\n")), "\n"),
     spacing = p.plus(p.or(p.whitespace(), p.char(comment)))
 
-// trek parsers use the whitespace parser as part of the grammar to
-// do good things which you will see below.
-var parser = p.parser(spacing)
+// trek parsers use the whitespace parser as part of the stream.
+var stream = p.stream(spacing)
 
 var idFirst = p.or("_", "$", p.range("az")),
     identifier = p.lexeme(idFirst, p.star(p.or(idFirst, p.range("09"))))
@@ -27,7 +26,7 @@ var idFirst = p.or("_", "$", p.range("az")),
 // to match in between elements and stores an array of the contents.
 var manyIdentifiers = p.plus(identifier)
 
-var ast = parser.parse(manyIdentifiers, "hello totoro    friend")
+var ast = stream.parse(manyIdentifiers, "hello totoro    friend")
 // ast now contains ["hello", "totoro", "friend"]
 ```
 
