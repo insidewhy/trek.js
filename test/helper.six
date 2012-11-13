@@ -14,4 +14,3 @@ export var spacing = p.plus(p.char(" ")),
              return ast
            },
            parsePartial = (grammar, src) => p.parse(spacing, grammar, src)
-

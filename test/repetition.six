@@ -1,7 +1,6 @@
 import {expect, p, parse} from "./helper"
 
 describe("repetition parsers", () => {
-  // too early for testing, just using this for now
   it("parses many character ranges stores a string.", () => {
     var grammar = p.plus(p.range("az")),
         ast     = parse(grammar, "totoro")

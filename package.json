@@ -30,6 +30,6 @@
   },
   "main": "./trek.js",
   "scripts": {
-    "test": "node node_modules/mocha/bin/mocha --compilers six:six-jpike"
+    "test": "node node_modules/mocha/bin/mocha"
   }
 }

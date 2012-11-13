@@ -31,4 +31,3 @@ describe("lexeme", () => {
     expect(parsePartial(grammar, "h .bear")).to.equal(null)
   })
 })
-
