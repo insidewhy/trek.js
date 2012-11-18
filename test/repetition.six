@@ -9,11 +9,13 @@ describe("repetition parsers", () => {
   })
 
   it("plus(string) stores a list of strings.", () => {
-    var grammar = p.plus(p.plus(p.range("az"))),
-        ast     = parse(grammar, "my friend   totoro")
+    var grammar = p.plus(p.or(p.plus(p.range("az")), p.plus(p.range("09")))),
+        ast     = parse(grammar, "my friend420   totoro")
 
     expect(ast[0]).to.equal("my")
-    expect(ast[2]).to.equal("totoro")
+    expect(ast[1]).to.equal("friend")
+    expect(ast[2]).to.equal("420")
+    expect(ast[3]).to.equal("totoro")
   })
 
   it("plusLex(string) stores a string.", () => {
