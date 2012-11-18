@@ -4,13 +4,13 @@ import stream from './parse/stream'
 import {sequence, lexeme} from './parse/sequence'
 import {node, member} from './parse/node'
 import {range, notChar, char, Char} from './parse/char'
-import {plus, star} from './parse/repetition'
+import {plus, plusLex, star, starLex} from './parse/repetition'
 import or from './parse/or'
 
 //////////////////////////////////////////////////////////////////////////////
 // re-export stuff
 export stream, sequence, lexeme, node, member,
-       range, notChar, char, Char, plus, star, or
+       range, notChar, char, Char, plus, plusLex, star, starLex, or
 
 // Flags for parsers
 //    constant = true        -> what parser skips is always the same

@@ -1,18 +1,25 @@
-import {expect, p, parse} from "./helper"
+import {expect, p, parse, parsePartial} from "./helper"
 
 describe("repetition parsers", () => {
-  it("parses many character ranges stores a string.", () => {
+  it("plus(characterRange) stores a string.", () => {
     var grammar = p.plus(p.range("az")),
         ast     = parse(grammar, "totoro")
 
     expect(ast).to.equal("totoro")
   })
 
-  it("parses many strings stores a list of strings.", () => {
+  it("plus(string) stores a list of strings.", () => {
     var grammar = p.plus(p.plus(p.range("az"))),
         ast     = parse(grammar, "my friend   totoro")
 
     expect(ast[0]).to.equal("my")
     expect(ast[2]).to.equal("totoro")
+  })
+
+  it("plusLex(string) stores a string.", () => {
+    var grammar = p.plusLex(p.or(p.plus(p.range("az")), p.plus(p.range("09")))),
+        ast     = parsePartial(grammar, "friend420isgood ohyeah")
+
+    expect(ast).to.equal("friend420isgood")
   })
 })

@@ -29,7 +29,7 @@ class ParseMany {
   }
 }
 
-class ParseManyChar extends StoresString {
+class ParseManyLex extends StoresString {
   constructor(atLeastOne, parser) {
     super()
     this.atLeastOne = atLeastOne
@@ -45,10 +45,13 @@ class ParseManyChar extends StoresString {
   }
 }
 
-function many(atLeastOne, parser) {
-  return parser.stores === Char ?
-    new ParseManyChar(atLeastOne, parser) : new ParseMany(atLeastOne, parser)
+function many(atLeastOne, lex, parser) {
+  return lex ? new ParseManyLex(atLeastOne, parser) :
+    parser.stores === Char ? new ParseManyLex(atLeastOne, parser) :
+                             new ParseMany(atLeastOne, parser)
 }
 
-export function star() { return many(false, makeSeq(arguments)) }
-export function plus() { return many(true, makeSeq(arguments)) }
+export function star() { return many(false, false, makeSeq(arguments)) }
+export function starLex() { return many(false, true, makeSeq(arguments)) }
+export function plus() { return many(true, false, makeSeq(arguments)) }
+export function plusLex() { return many(true, true, makeSeq(arguments)) }
