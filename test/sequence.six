@@ -9,4 +9,14 @@ describe("sequence", () => {
     expect(ast[0]).to.equal("mr")
     expect(ast[1]).to.equal("hammer")
   })
+
+  it("sequence(string, sequence(string, string)) stores 3-tuple.", () => {
+    var str     = p.plus(p.range("az")),
+        grammar = p.sequence(str, p.sequence(str, str)),
+        ast     = parse(grammar, "we love totoro")
+
+    expect(ast[0]).to.equal("we")
+    expect(ast[1]).to.equal("love")
+    expect(ast[2]).to.equal("totoro")
+  })
 })
