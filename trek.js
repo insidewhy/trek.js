@@ -1,5 +1,3 @@
-require('six-jpike');
-
 var desc = {},
     trek = require('./lib/trek')
 
