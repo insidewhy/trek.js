@@ -8,4 +8,8 @@ describe("node parsing", () => {
     expect(ast.name).to.equal("totoro")
     expect(ast.type).to.equal("Friend")
   })
+
+  it("parses multiple layers of nodes.", () => {
+    // TODO:
+  })
 })
