@@ -1,0 +1,22 @@
+@module  trek
+@grammar grammar
+
+Spacing           <- (\s / "//" ^ (!\n)* ^ \n)+
+AnyCharacter      <- '.'
+CharacterRange    <= "[" ^ ( [\\] ^ [\\\]sSnNtTwW] / (. ^ "-" ^ .) / .)* ^ "]"
+Escape            <- [\\] ^ [sSnNtTwW."'&!+*\\]
+String            <= '"' ^ (Escape / ! '"')^* ^ '"' /
+                     "'" ^ (Escape / ! "'")^* ^ "'"
+Identifier        <- [a-zA-Z_] ^ [a-zA-Z0-9_]+
+ScopedRule        <= Identifier "::" Identifier
+Primary           <- String / CharacterRange / Escape / AnyCharacter /
+                     ScopedRule / Identifier &! "<" / "(" Expression ")"
+Suffix            <= Primary ( "^+" / "^*" / [?*+] / "|+" / "|?" )|?
+Prefix            <= ( "&!" / "#+" / [&!#] )|? Suffix
+Join              <= Prefix ("^%" / "%+" / "%" / "|%" / "|^%") Prefix
+Joined            <= (Join / Prefix) |% "^"
+Sequence          <= Joined |+
+OrderedChoice     <= Sequence |% "/"
+Expression        <= OrderedChoice
+Rule              <= #Identifier "<" ^ [-=] Expression
+Grammar           <- Rule+
