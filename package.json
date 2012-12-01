@@ -30,7 +30,7 @@
   },
   "main": "./trek.js",
   "scripts": {
-    "test": "mocha",
+    "test": "six -co test test/src && mocha",
     "install": "six -co lib src"
   }
 }
