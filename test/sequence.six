@@ -1,0 +1,12 @@
+import {expect, p, parse, parsePartial} from "./helper"
+
+describe("sequence", () => {
+  it("skips 2 string parsers to return a pair.", () => {
+    var str     = p.plus(p.range("az")),
+        grammar = p.sequence(str, str),
+        ast     = parse(grammar, "mr hammer")
+
+    expect(ast[0]).to.equal("mr")
+    expect(ast[1]).to.equal("hammer")
+  })
+})

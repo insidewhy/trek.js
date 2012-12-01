@@ -1,6 +1,5 @@
 import {expect, p, parse, parsePartial} from "./helper"
 
-
 describe("lexeme", () => {
   it("skips 3 characters to store a string.", () => {
     var grammar = p.lexeme(p.range("az"), p.notChar("_"), p.range("az")),

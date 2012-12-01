@@ -3,6 +3,8 @@ import {ParseString, makeParser, StoresString} from './string'
 
 module _ = 'underscore'
 
+//////////////////////////////////////////////////////////////////////////////
+// lexeme
 class SkipParsers extends StoresString {
   constructor() {
     super()
@@ -51,16 +53,6 @@ class ParseLexeme {
   }
 }
 
-export function makeSeq(args, offset) {
-  if (! offset)
-    offset = 0
-
-  if (offset + 1 === args.length)
-    return makeParser(args[offset])
-  else
-    return sequence.apply(this, [].slice.call(args, offset))
-}
-
 export function lexeme(...parsers) {
   var parser,
       canBeJoined =
@@ -95,7 +87,47 @@ export function lexeme(...parsers) {
   return 1 === parsers.length ?  parsers[0] : new ParseLexeme(parsers)
 }
 
+//////////////////////////////////////////////////////////////////////////////
+// sequence
+class ParseSequence extends ParseLexeme {
+  constructor(parsers) {
+    this.isTuple = true // to distinguish for merging
+    // six bug: should be - super(parsers)
+    ParseLexeme.call(this, parsers)
+  }
+
+  parse(stream) {
+    var first = stream.idx, ast = []
+    for (var i = 0; i < this.parsers.length - 1; ++i) {
+      if (! this.parsers[i](stream, ast)) {
+        stream.idx = first
+        return null
+      }
+      stream.skipWhitespace()
+    }
+
+    if (! this.parsers[this.parsers.length - 1](stream, ast)) {
+      stream.idx = first
+      return null
+    }
+
+    return ast.length === 1 ? ast[0] : ast
+  }
+}
+
 export function sequence(...parsers) {
-  parsers = parsers.map(makeParser)
-  // TODO:
+  var parsers = parsers.map(makeParser)
+  return 1 == parsers.length ? parsers[0] : new ParseSequence(parsers)
+}
+
+//////////////////////////////////////////////////////////////////////////////
+// helper for other parsers that take multiple parsers to form a sequence
+export function makeSeq(args, offset) {
+  if (! offset)
+    offset = 0
+
+  if (offset + 1 === args.length)
+    return makeParser(args[offset])
+  else
+    return sequence.apply(this, [].slice.call(args, offset))
 }
