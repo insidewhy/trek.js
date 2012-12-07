@@ -1,10 +1,10 @@
 .PHONY: recompile test test-dev clean
 
-PATH += :./node_modules/mocha/bin
+PATH += :./node_modules/.bin
 
 recompile:
 	six -co lib src
-	six -co test/src test
+	six -co test test/src
 
 test:
 	mocha

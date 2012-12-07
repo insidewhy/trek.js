@@ -3,7 +3,7 @@ import {parse: p} from "../trek"
 
 export p, expect
 
-export var spacing = p.plus(p.char(" ")),
+export var spacing = p.star(p.char(" ")),
            parse   = (grammar, src) => {
              var stream = p.stream(spacing),
                  ast    = stream.parse(grammar, src)

@@ -93,3 +93,9 @@ export function char(chars) {
   chars.stores = Char
   return chars
 }
+
+export var whitespace = {
+  isConstant: true,
+  parse(stream) { return stream.spacing.skip(stream) },
+  skip(stream)  { return stream.spacing.skip(stream) },
+}

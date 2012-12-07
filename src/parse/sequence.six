@@ -1,4 +1,4 @@
-import Char from './char'
+import {Char, whitespace} from './char'
 import {ParseString, makeParser, StoresString} from './string'
 
 module _ = 'underscore'
@@ -26,9 +26,14 @@ class SkipParsers extends StoresString {
 
 class ParseLexeme {
   constructor(parsers) {
+    this.stores = Tuple
+
     this.parsers = parsers.map(p => {
       if (p.isConstant) {
         return (stream, ast) => p.skip(stream)
+      }
+      else if (p.stores === Tuple) {
+        return (stream, ast) => null !== p.parse(stream, ast)
       }
       else {
         return (stream, ast) => {
@@ -43,8 +48,10 @@ class ParseLexeme {
     })
   }
 
-  parse(stream) {
-    var first = stream.idx, ast = []
+  parse(stream, ast) {
+    var first = stream.idx
+    if (! ast)
+      ast = []
     for (var idx in this.parsers) {
       if (! this.parsers[idx](stream, ast)) {
         stream.idx = first
@@ -91,54 +98,19 @@ export function lexeme(...parsers) {
 
 //////////////////////////////////////////////////////////////////////////////
 // sequence
-class ParseSequence {
-  constructor(parsers) {
-    this.stores = Tuple
-
-    this.parsers = parsers.map(p => {
-      if (p.isConstant) {
-        return (stream, ast) => p.skip(stream)
-      }
-      else if (p.stores === Tuple) {
-        return (stream, ast) => null !== p.parse(stream, ast)
-      }
-      else {
-        return (stream, ast) => {
-          var ret
-          if (ret = p.parse(stream)) {
-            ast.push(ret)
-            return true
-          }
-          else return false
-        }
-      }
-    })
-  }
-
-  parse(stream, ast) {
-    var first = stream.idx
-    if (! ast) ast = []
-
-    for (var i = 0; i < this.parsers.length - 1; ++i) {
-      if (! this.parsers[i](stream, ast)) {
-        stream.idx = first
-        return null
-      }
-      stream.skipWhitespace()
-    }
-
-    if (! this.parsers[this.parsers.length - 1](stream, ast)) {
-      stream.idx = first
-      return null
-    }
-
-    return ast.length === 1 ? ast[0] : ast
-  }
-}
-
 export function sequence(...parsers) {
   var parsers = parsers.map(makeParser)
-  return 1 == parsers.length ? parsers[0] : new ParseSequence(parsers)
+  if (1 == parsers.length)
+    return parsers[0]
+
+  var lexParsers = []
+  for (var i = 0; i < parsers.length - 1; ++i) {
+    lexParsers.push(parsers[i])
+    lexParsers.push(whitespace)
+  }
+
+  lexParsers.push(parsers[parsers.length - 1])
+  return new ParseLexeme(lexParsers)
 }
 
 //////////////////////////////////////////////////////////////////////////////
