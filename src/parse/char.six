@@ -25,9 +25,9 @@ class StoresChar {
 
 class ParseConstantChar {
   constructor(ch) {
-    this.stores = Char
     this.value = ch
-    this.isConstant = true
+    this.stores = null
+    this.skips = Char
   }
 
   skip(stream) {
@@ -95,7 +95,7 @@ export function char(chars) {
 }
 
 export var whitespace = {
-  isConstant: true,
+  stores: null,
   parse(stream) { return stream.spacing.skip(stream) },
   skip(stream)  { return stream.spacing.skip(stream) },
 }

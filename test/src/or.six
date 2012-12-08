@@ -19,7 +19,7 @@ describe("or parser", () => {
       p.node("Friend", p.member("name", p.plus(p.range("az")))),
       p.plus(p.range("09")))
 
-    expect(grammar.stores).to.equal(undefined)
+    expect(grammar.stores).to.equal(p.Variant)
 
     var ast = parse(grammar, "sisko")
     expect(ast.name).to.equal("sisko")

@@ -2,6 +2,8 @@ module _ = 'underscore'
 import Char from './char'
 import makeParser from './string'
 
+export var Variant = 3
+
 class ParseOr {
   constructor(choices) {
     this.choices = choices
@@ -15,12 +17,13 @@ class ParseOr {
     var stores = null
 
     var hasNonCharStr = _.find(choices, p => {
-      if (! p.stores) {
+      var newStores = p.stores || p.skips
+      if (! newStores) {
         stores = null
         return true
       }
 
-      if (p.stores === String)
+      if (newStores === String)
         stores = String
       else
         stores = Char
@@ -28,6 +31,8 @@ class ParseOr {
 
     if (stores)
       this.stores = stores
+    else
+      this.stores = Variant
   }
 
   skip(stream) {

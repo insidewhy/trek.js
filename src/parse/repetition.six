@@ -27,6 +27,21 @@ class ParseMany {
 
     return ret
   }
+
+  skip(stream) {
+    if (! this.parser.skip(stream))
+      return this.atLeastOne ? true : false
+
+    stream.skipWhitespace()
+    if (stream.empty) return true
+
+    while (this.parser.skip(stream)) {
+      stream.skipWhitespace()
+      if (stream.empty) return true
+    }
+
+    return true
+  }
 }
 
 class ParseManyLex extends StoresString {

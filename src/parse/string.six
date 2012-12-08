@@ -17,9 +17,9 @@ class StoresString {
 
 class ParseConstant {
   constructor(value) {
-    this.stores = String
+    this.skips = String
+    this.stores = null
     this.value = value
-    this.isConstant = true
   }
 
   skip(stream) {

@@ -11,7 +11,7 @@ class SkipParsers extends StoresString {
   constructor() {
     super()
     this.parsers = []
-    this.isConstant = true
+    this.stores = String
   }
 
   skip(stream) {
@@ -29,7 +29,7 @@ class ParseLexeme {
     this.stores = Tuple
 
     this.parsers = parsers.map(p => {
-      if (p.isConstant) {
+      if (p.stores === null) {
         return (stream, ast) => p.skip(stream)
       }
       else if (p.stores === Tuple) {
@@ -62,10 +62,15 @@ class ParseLexeme {
   }
 }
 
+function lexemeHelper(parsers) {
+  // TODO: if only single storing parser, dispatch to alternate parser
+  return new ParseLexeme(parsers)
+}
+
 export function lexeme(...parsers) {
   var parser,
       canBeJoined =
-        p => !p.isConstant && (p.stores === Char || p.stores === String),
+        p => p.stores === Char || p.stores === String,
       skipper
 
   // try to join string/char storing parsers together into longer
@@ -93,7 +98,7 @@ export function lexeme(...parsers) {
     }
   }
 
-  return 1 === parsers.length ?  parsers[0] : new ParseLexeme(parsers)
+  return 1 === parsers.length ?  parsers[0] : lexemeHelper(parsers)
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -110,7 +115,7 @@ export function sequence(...parsers) {
   }
 
   lexParsers.push(parsers[parsers.length - 1])
-  return new ParseLexeme(lexParsers)
+  return lexemeHelper(lexParsers)
 }
 
 //////////////////////////////////////////////////////////////////////////////
