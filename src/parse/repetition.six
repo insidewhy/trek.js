@@ -1,7 +1,9 @@
 import makeSeq from './sequence'
-import StoresString from './string'
+import {StoresString, makeParser} from './string'
 import Char from './char'
 
+//////////////////////////////////////////////////////////////////////////////
+// many: plus/star
 class ParseMany {
   constructor(atLeastOne, parser) {
     this.atLeastOne = atLeastOne
@@ -44,6 +46,7 @@ class ParseMany {
   }
 }
 
+// plus/star Lex
 class ParseManyLex extends StoresString {
   constructor(atLeastOne, parser) {
     super()
@@ -82,21 +85,113 @@ export function plusLex(...parsers) {
   return many(true, true, makeSeq(parsers))
 }
 
-function _join(atLeastOne, lex, parser) {
+//////////////////////////////////////////////////////////////////////////////
+// join
+class ParseJoin {
+  constructor(atLeastOne, joinParser, parser) {
+    this.atLeastOne = atLeastOne
+    this.joinParser = joinParser
+    this.parser = parser
+  }
+
+  parse(stream) {
+    var ret = [],
+        ast = this.parser.parse(stream)
+
+    if (! ast)
+      return this.atLeastOne ? null : []
+
+    ret.push(ast)
+    stream.skipWhitespace()
+    if (stream.empty || ! this.joinParser.skip(stream)) return ret
+    stream.skipWhitespace()
+
+    while (ast = this.parser.parse(stream)) {
+      ret.push(ast)
+      stream.skipWhitespace()
+      if (stream.empty || ! this.joinParser.skip(stream)) return ret
+      stream.skipWhitespace()
+    }
+
+    return ret
+  }
+
+  skip(stream) {
+    if (! this.parser.skip(stream))
+      return this.atLeastOne ? true : false
+
+    stream.skipWhitespace()
+    if (stream.empty || ! this.joinParser.skip(stream)) return true
+    stream.skipWhitespace()
+
+    while (this.parser.skip(stream)) {
+      stream.skipWhitespace()
+      if (stream.empty || ! this.joinParser.skip(stream)) return true
+      stream.skipWhitespace()
+    }
+
+    return true
+  }
+}
+
+class ParseJoinLex {
+  constructor(atLeastOne, joinParser, parser) {
+    this.atLeastOne = atLeastOne
+    this.joinParser = joinParser
+    this.parser = parser
+  }
+
+  parse(stream) {
+    var ret = [],
+        ast = this.parser.parse(stream)
+
+    if (! ast)
+      return this.atLeastOne ? null : []
+
+    ret.push(ast)
+    if (stream.empty || ! this.joinParser.skip(stream)) return ret
+
+    while (ast = this.parser.parse(stream)) {
+      ret.push(ast)
+      if (stream.empty || ! this.joinParser.skip(stream)) return ret
+    }
+
+    return ret
+  }
+
+  skip(stream) {
+    if (! this.parser.skip(stream))
+      return this.atLeastOne ? true : false
+
+    if (stream.empty || ! this.joinParser.skip(stream)) return true
+
+    while (this.parser.skip(stream)) {
+      if (stream.empty || ! this.joinParser.skip(stream)) return true
+    }
+
+    return true
+  }
+}
+
+
+function joinHelper(atLeastOne, lex, joinParser, parser) {
+  return lex ? new ParseJoinLex(atLeastOne, joinParser, parser) :
+    parser.stores === Char ? new ParseJoinLex(atLeastOne, joinParser, parser) :
+                             new ParseJoin(atLeastOne, joinParser, parser)
 }
 
 export function join(joinParser, ...parsers) {
-  return joinHelper(false, false, joinParsers, makeSeq(parsers))
+  return joinHelper(false, false, makeParser(joinParser), makeSeq(parsers))
 }
 
 export function joinLex(joinParser, ...parsers) {
-  return joinHelper(false, true, joinParsers, makeSeq(parsers))
+  return joinHelper(false, true, makeParser(joinParser), makeSeq(parsers))
 }
 
 export function joinPlus(joinParser, ...parsers) {
-  return joinHelper(true, false, joinParsers, makeSeq(parsers))
+  return joinHelper(true, false, makeParser(joinParsers), makeSeq(parsers))
 }
 
 export function joinPlusLex(joinParser, ...parsers) {
-  return joinHelper(true, true, joinParsers, makeSeq(parsers))
+  return joinHelper(true, true, makeParser(joinParsers), makeSeq(parsers))
 }
