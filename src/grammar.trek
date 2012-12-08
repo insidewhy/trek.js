@@ -1,5 +1,4 @@
-@module  trek
-@grammar grammar
+grammar trek.grammar
 
 Spacing           <- (\s / "//" ^ (!\n)* ^ \n)+
 AnyCharacter      <- '.'
@@ -19,4 +18,5 @@ Sequence          <= Joined |+
 OrderedChoice     <= Sequence |% "/"
 Expression        <= OrderedChoice
 Rule              <= #Identifier "<" ^ [-=] Expression
-Grammar           <- Rule+
+GrammarDecl       <= "grammar" Identifier % "."
+Grammar           <- GrammarDecl? Rule+
