@@ -120,12 +120,9 @@ export function sequence(...parsers) {
 
 //////////////////////////////////////////////////////////////////////////////
 // helper for other parsers that take multiple parsers to form a sequence
-export function makeSeq(args, offset) {
-  if (! offset)
-    offset = 0
-
-  if (offset + 1 === args.length)
-    return makeParser(args[offset])
+export function makeSeq(args) {
+  if (1 === args.length)
+    return makeParser(args[0])
   else
-    return sequence.apply(this, [].slice.call(args, offset))
+    return sequence.apply(this, args)
 }

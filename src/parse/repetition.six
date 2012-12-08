@@ -66,7 +66,37 @@ function many(atLeastOne, lex, parser) {
                              new ParseMany(atLeastOne, parser)
 }
 
-export function star() { return many(false, false, makeSeq(arguments)) }
-export function starLex() { return many(false, true, makeSeq(arguments)) }
-export function plus() { return many(true, false, makeSeq(arguments)) }
-export function plusLex() { return many(true, true, makeSeq(arguments)) }
+export function star(...parsers){
+  return many(false, false, makeSeq(parsers))
+}
+
+export function starLex(...parsers) {
+  return many(false, true, makeSeq(parsers))
+}
+
+export function plus(...parsers) {
+  return many(true, false, makeSeq(parsers))
+}
+
+export function plusLex(...parsers) {
+  return many(true, true, makeSeq(parsers))
+}
+
+function _join(atLeastOne, lex, parser) {
+}
+
+export function join(joinParser, ...parsers) {
+  return joinHelper(false, false, joinParsers, makeSeq(parsers))
+}
+
+export function joinLex(joinParser, ...parsers) {
+  return joinHelper(false, true, joinParsers, makeSeq(parsers))
+}
+
+export function joinPlus(joinParser, ...parsers) {
+  return joinHelper(true, false, joinParsers, makeSeq(parsers))
+}
+
+export function joinPlusLex(joinParser, ...parsers) {
+  return joinHelper(true, true, joinParsers, makeSeq(parsers))
+}

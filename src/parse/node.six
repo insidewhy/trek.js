@@ -49,12 +49,10 @@ class ParseMember {
 
 //////////////////////////////////////////////////////////////////////////////
 // factories
-export function node() {
-  var type   = arguments[0]
-  return new ParseNode(type, makeSeq(arguments, 1))
+export function node(type, ...parsers) {
+  return new ParseNode(type, makeSeq(parsers))
 }
 
-export function member() {
-  var name   = arguments[0]
-  return new ParseMember(name, makeSeq(arguments, 1))
+export function member(name, ...parsers) {
+  return new ParseMember(name, makeSeq(parsers))
 }
