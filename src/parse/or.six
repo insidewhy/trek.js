@@ -13,20 +13,20 @@ class ParseOr {
     // else if all subparsers store character or string storing parsers
     //   stores = String
     // else
-    //   no stores
-    var stores = null
+    //   stores = Variant
+    var stores
 
     var hasNonCharStr = _.find(choices, p => {
       var newStores = p.stores || p.skips
-      if (! newStores) {
-        stores = null
-        return true
-      }
 
       if (newStores === String)
         stores = String
-      else
+      else if (newStores === Char)
         stores = Char
+      else {
+        stores = null
+        return true
+      }
     })
 
     if (stores)
@@ -64,4 +64,3 @@ class ParseOr {
 export function or(...choices) {
   return new ParseOr(choices.map(makeParser))
 }
-

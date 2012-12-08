@@ -2,7 +2,7 @@ import makeSeq from './sequence'
 
 // A node is a special type of AST element that can't be broken down by
 // grammar rules. It may include range information.
-class Node {
+export class Node {
   constructor(stream, type) {
     this.range = [ stream.idx ]
     this.type = type
@@ -20,6 +20,7 @@ class ParseNode {
   constructor(type, parser) {
     this.type = type
     this.parser = parser
+    this.stores = Node
   }
 
   parse(stream) {
