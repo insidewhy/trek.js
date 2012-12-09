@@ -1,22 +1,17 @@
-import {expect, p, parse, parsePartial} from "./helper"
+import {expect, p, parse, parsePartial, word} from "./helper"
 
 describe("sequence", () => {
   it("skips 2 string parsers to return a pair.", () => {
-    var str     = p.plus(p.range("az")),
-        grammar = p.sequence(str, str),
+    var grammar = p.sequence(word, word),
         ast     = parse(grammar, "mr hammer")
 
-    expect(ast[0]).to.equal("mr")
-    expect(ast[1]).to.equal("hammer")
+    expect(ast).to.eql(["mr", "hammer"])
   })
 
   it("sequence(string, sequence(string, string)) stores 3-tuple.", () => {
-    var str     = p.plus(p.range("az")),
-        grammar = p.sequence(str, p.sequence(str, str)),
+    var grammar = p.sequence(word, p.sequence(word, word)),
         ast     = parse(grammar, "we love totoro")
 
-    expect(ast[0]).to.equal("we")
-    expect(ast[1]).to.equal("love")
-    expect(ast[2]).to.equal("totoro")
+    expect(ast).to.eql(["we", "love", "totoro"])
   })
 })

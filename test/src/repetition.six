@@ -1,36 +1,38 @@
-import {expect, p, parse, parsePartial} from "./helper"
+import {expect, p, parse, parsePartial, word} from "./helper"
 
 describe("repetition parsers", () => {
   it("plus(characterRange) stores a string.", () => {
-    var grammar = p.plus(p.range("az")),
+    var grammar = word,
         ast     = parse(grammar, "totoro")
 
     expect(ast).to.equal("totoro")
   })
 
   it("plus(string) stores a list of strings.", () => {
-    var grammar = p.plus(p.or(p.plus(p.range("az")), p.plus(p.range("09")))),
+    var grammar = p.plus(p.or(word, p.plus(p.range("09")))),
         ast     = parse(grammar, "my friend420   totoro")
 
-    expect(ast[0]).to.equal("my")
-    expect(ast[1]).to.equal("friend")
-    expect(ast[2]).to.equal("420")
-    expect(ast[3]).to.equal("totoro")
+    expect(ast).to.eql(["my", "friend", "420", "totoro"])
   })
 
   it("plusLex(string) stores a string.", () => {
-    var grammar = p.plusLex(p.or(p.plus(p.range("az")), p.plus(p.range("09")))),
+    var grammar = p.plusLex(p.or(word, p.plus(p.range("09")))),
         ast     = parsePartial(grammar, "friend420isgood ohyeah")
 
     expect(ast).to.equal("friend420isgood")
   })
 
   it("join(char, string) stores a list of strings.", () => {
-    var grammar = p.join(",", p.or(p.plus(p.range("az")), p.plus(p.range("09")))),
+    var grammar = p.join(",", word),
         ast     = parse(grammar, "my,friend , barneys")
 
-    expect(ast[0]).to.equal("my")
-    expect(ast[1]).to.equal("friend")
-    expect(ast[2]).to.equal("barneys")
+    expect(ast).to.eql(["my", "friend", "barneys"])
+  })
+
+  it("joinLex(char, string) stores a list of strings.", () => {
+    var grammar = p.joinLex(",", word),
+        ast     = parsePartial(grammar, "barneys,lounge , friend")
+
+    expect(ast).to.eql(["barneys", "lounge"])
   })
 })

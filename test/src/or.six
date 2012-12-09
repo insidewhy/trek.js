@@ -1,4 +1,4 @@
-import {expect, p, parse, parsePartial} from "./helper"
+import {expect, p, parse, parsePartial, word} from "./helper"
 
 describe("or parser", () => {
   it("using or() over many char storing parsers, stores a char", () => {
@@ -7,7 +7,7 @@ describe("or parser", () => {
   })
 
   it("using or() over String and char storing parsers stores a String", () => {
-    var grammar = p.or(p.range("AZ"), p.plus(p.range("az")))
+    var grammar = p.or(p.range("AZ"), word)
     expect(grammar.stores).to.equal(String)
 
     expect(parsePartial(grammar, "Allo")).to.equal("A")
@@ -16,7 +16,7 @@ describe("or parser", () => {
 
   it("using or() over String and node parser to return varying type.", () => {
     var grammar = p.or(
-      p.node("Friend", p.member("name", p.plus(p.range("az")))),
+      p.node("Friend", p.member("name", word)),
       p.plus(p.range("09")))
 
     expect(grammar.stores).to.equal(p.Variant)

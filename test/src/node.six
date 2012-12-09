@@ -1,8 +1,8 @@
-import {expect, p, parse} from "./helper"
+import {expect, p, parse, word} from "./helper"
 
 describe("node parsing", () => {
   it("parses into a node with range information.", () => {
-    var grammar = p.node("Friend", p.member("name", p.plus(p.range("az")))),
+    var grammar = p.node("Friend", p.member("name", word)),
         ast     = parse(grammar, "totoro")
 
     expect(ast.name).to.equal("totoro")
