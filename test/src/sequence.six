@@ -14,4 +14,11 @@ describe("sequence", () => {
 
     expect(ast).to.eql(["we", "love", "totoro"])
   })
+
+  it("sequence(null, string) stores string.", () => {
+    var grammar = p.sequence("var", word),
+        ast     = parse(grammar, "var kitten")
+
+    expect(ast).to.eql("kitten")
+  })
 })

@@ -1,0 +1,5 @@
+export function test(...parsers) {
+}
+
+export function not(...parsers) {
+}

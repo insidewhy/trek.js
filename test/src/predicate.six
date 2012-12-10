@@ -1,0 +1,12 @@
+import {expect, p, parse, word} from "./helper"
+
+describe("predicates", () => {
+  it("`test' example", () => {
+    // TODO:
+  })
+
+  it("`not' example.", () => {
+    // TODO:
+  })
+})
+
