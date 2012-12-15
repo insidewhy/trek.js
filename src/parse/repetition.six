@@ -32,7 +32,7 @@ class ParseMany {
 
   skip(stream) {
     if (! this.parser.skip(stream))
-      return this.atLeastOne ? true : false
+      return ! this.atLeastOne
 
     stream.skipWhitespace()
     if (stream.empty) return true
@@ -161,7 +161,7 @@ class ParseJoinLex {
 
   skip(stream) {
     if (! this.parser.skip(stream))
-      return this.atLeastOne ? true : false
+      return ! this.atLeastOne
 
     if (stream.empty || ! this.joinParser.skip(stream)) return true
 

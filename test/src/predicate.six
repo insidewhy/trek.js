@@ -2,7 +2,6 @@ import {expect, p, parse, parsePartial, word} from "./helper"
 
 describe("predicates", () => {
   it("`test' example", () => {
-    // TODO: find out why sequence won't work but lexeme will
     var grammar = p.plus(p.lexeme(p.test("a"), word)),
         ast     = parsePartial(grammar, "abolor afriend tbolor")
 
