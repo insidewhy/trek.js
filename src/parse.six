@@ -7,7 +7,7 @@ import {range, notChar, char, Char} from './parse/char'
 import {plus, plusLex, star, starLex, join,
         joinLex, joinPlus, joinPlusLex} from './parse/repetition'
 import {or, Variant} from './parse/or'
-import {test, not} from './parse/predicate'
+import {test, testNot, not} from './parse/predicate'
 
 //////////////////////////////////////////////////////////////////////////////
 // re-export stuff
@@ -17,7 +17,7 @@ export stream,
        range, notChar, char, Char,
        plus, plusLex, star, starLex, join, joinLex, joinPlus, joinPlusLex,
        or, Variant,
-       test, not
+       test, testNot, not
 
 // Flags for parsers
 //    constant = true        -> what parser skips is always the same

@@ -8,8 +8,11 @@ describe("predicates", () => {
     expect(ast).to.eql(["abolor", "afriend"])
   })
 
-  it("`not' example.", () => {
-    // TODO:
+  it("`testNot(char)' example.", () => {
+    var grammar = p.plus(p.lexeme(p.testNot("a"), word)),
+        ast     = parsePartial(grammar, "chinny binman aforte")
+
+    expect(ast).to.eql(["chinny", "binman"])
   })
 })
 

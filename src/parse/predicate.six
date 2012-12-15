@@ -29,11 +29,11 @@ class ParseNot {
   parse(stream) {
     var first = stream.idx
     if (this.parser.skip(stream)) {
-      return true
+      return false
     }
     else {
       stream.idx = first
-      return false
+      return true
     }
   }
 
@@ -59,7 +59,7 @@ class ParseNotSkipChar {
   }
 
   skip(stream) {
-    return ! this.parser.skip(stream)
+    return this.parser.skip(stream) !== null
   }
 }
 
