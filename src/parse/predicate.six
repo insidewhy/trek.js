@@ -1,5 +1,79 @@
+import makeSeq from './sequence'
+import Char from './char'
+
+class ParseTest {
+  constructor(parser) {
+    this.parser = parser
+    this.stores = null
+  }
+
+  parse(stream) {
+    var first = stream.idx
+    if (this.parser.skip(stream)) {
+      stream.idx = first
+      return true
+    }
+    else
+      return false
+  }
+
+  skip(stream) { return this.parse(stream) }
+}
+
+class ParseNot {
+  constructor(parser) {
+    this.parser = parser
+    this.stores = null
+  }
+
+  parse(stream) {
+    var first = stream.idx
+    if (this.parser.skip(stream)) {
+      return true
+    }
+    else {
+      stream.idx = first
+      return false
+    }
+  }
+
+  skip(stream) { return this.parse(stream) }
+}
+
+class ParseNotSkipChar {
+  constructor(parser) {
+    this.stores = Char
+    this.parser = parser
+  }
+
+  parse(stream) {
+    if (! this.parser.skip(stream)) {
+      var ch = stream.front
+      ++stream.idx
+      return ch
+    }
+    else {
+      --stream.idx
+      return null
+    }
+  }
+
+  skip(stream) {
+    return ! this.parser.skip(stream)
+  }
+}
+
 export function test(...parsers) {
+  return new ParseTest(makeSeq(parsers))
+}
+
+export function testNot(...parsers) {
+  return new ParseNot(makeSeq(parsers))
 }
 
 export function not(...parsers) {
+  var parser = makeSeq(parsers)
+
+  return parser.stores === Char ?
+    new ParseNotSkipChar(parser) : new ParseNot(parser)
 }

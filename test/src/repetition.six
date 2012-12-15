@@ -8,6 +8,13 @@ describe("repetition parsers", () => {
     expect(ast).to.equal("totoro")
   })
 
+  it("star(char) succeeds on empty data.", () => {
+    var grammar = p.star(p.range("az")),
+        ast     = parse(grammar, "")
+
+    expect(typeof ast).to.equal("string")
+  })
+
   it("plus(string) stores a list of strings.", () => {
     var grammar = p.plus(p.or(word, p.plus(p.range("09")))),
         ast     = parse(grammar, "my friend420   totoro")
