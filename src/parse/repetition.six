@@ -189,9 +189,9 @@ export function joinLex(joinParser, ...parsers) {
 }
 
 export function joinPlus(joinParser, ...parsers) {
-  return joinHelper(true, false, makeParser(joinParsers), makeSeq(parsers))
+  return joinHelper(true, false, makeParser(joinParser), makeSeq(parsers))
 }
 
 export function joinPlusLex(joinParser, ...parsers) {
-  return joinHelper(true, true, makeParser(joinParsers), makeSeq(parsers))
+  return joinHelper(true, true, makeParser(joinParser), makeSeq(parsers))
 }

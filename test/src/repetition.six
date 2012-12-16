@@ -12,7 +12,7 @@ describe("repetition parsers", () => {
     var grammar = p.star(p.range("az")),
         ast     = parse(grammar, "")
 
-    expect(typeof ast).to.equal("string")
+    expect(ast).to.equal("")
   })
 
   it("plus(string) stores a list of strings.", () => {

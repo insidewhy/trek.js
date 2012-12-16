@@ -10,6 +10,17 @@ describe("node parsing", () => {
   })
 
   it("parses multiple layers of nodes.", () => {
-    // TODO:
+    var wsNoNl = p.star(p.char("\r\t "))
+    var Identifier = p.node("Identifier", p.member("name", word)),
+        Variable   = p.node(
+          "VariableDeclaration",
+          "var",
+          p.member("declarations",
+                   p.joinPlusLex(p.lexeme(wsNoNl, ",", p.whitespace),
+                                 Identifier))),
+        grammar    = p.plus(Variable),
+        ast        = parse(grammar, "var friend, \nkitten")
+
+    expect(ast[0].declarations[1].name).to.equal("kitten")
   })
 })

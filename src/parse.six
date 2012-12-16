@@ -3,7 +3,7 @@ module _ = 'underscore'
 import stream from './parse/stream'
 import {sequence, lexeme, Tuple} from './parse/sequence'
 import {Node, node, member} from './parse/node'
-import {range, notChar, char, Char} from './parse/char'
+import {range, notChar, char, Char, whitespace} from './parse/char'
 import {plus, plusLex, star, starLex, join,
         joinLex, joinPlus, joinPlusLex} from './parse/repetition'
 import {or, Variant} from './parse/or'
@@ -14,7 +14,7 @@ import {test, testNot, not} from './parse/predicate'
 export stream,
        sequence, lexeme, Tuple,
        Node, node, member,
-       range, notChar, char, Char,
+       range, notChar, char, Char, whitespace,
        plus, plusLex, star, starLex, join, joinLex, joinPlus, joinPlusLex,
        or, Variant,
        test, testNot, not
