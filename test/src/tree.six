@@ -1,0 +1,6 @@
+import {expect, p, parse, word} from "./helper"
+
+describe("tree parsing", () => {
+  it("treePlus(p) storing both p and a node", () => {
+  })
+})
