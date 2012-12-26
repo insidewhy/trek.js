@@ -6,6 +6,7 @@ export p, expect
 export var spacing = p.star(p.char(" \n\r\t")),
            word    = p.plus(p.range("az")),
            parse   = (grammar, src) => {
+             p.grammar()
              var stream = p.stream(spacing),
                  ast    = stream.parse(grammar, src)
 
@@ -14,5 +15,8 @@ export var spacing = p.star(p.char(" \n\r\t")),
 
              return ast
            },
-           parsePartial = (grammar, src) => p.parse(spacing, grammar, src),
+           parsePartial = (grammar, src) => {
+             p.grammar()
+             return p.parse(spacing, grammar, src)
+           },
            dump         = ast => { console.log(JSON.stringify(ast, null, 2)) }

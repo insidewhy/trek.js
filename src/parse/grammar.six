@@ -1,0 +1,10 @@
+module _ = 'underscore'
+import nodeTypes from './node'
+
+/// @brief  Clear internal parser state for use with a new grammar.
+/// @detail This is necessary to support self-referential nodes.
+export function grammar(name) {
+  var keys = _.keys(nodeTypes), i
+  for (i in keys)
+    delete nodeTypes[keys[i]]
+}

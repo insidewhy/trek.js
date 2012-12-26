@@ -9,6 +9,7 @@ import {plus, plusLex, star, starLex, join,
 import {or, Variant} from './parse/or'
 import {test, testNot, not} from './parse/predicate'
 import {treePlus, treePlusLex, treeJoin, treeJoinLex, treeOptional} from './parse/tree'
+import grammar from './parse/grammar'
 
 //////////////////////////////////////////////////////////////////////////////
 // re-export stuff
@@ -19,7 +20,8 @@ export stream,
        plus, plusLex, star, starLex, join, joinLex, joinPlus, joinPlusLex,
        or, Variant,
        test, testNot, not,
-       treePlus, treePlusLex, treeJoin, treeJoinLex, treeOptional
+       treePlus, treePlusLex, treeJoin, treeJoinLex, treeOptional,
+       grammar
 
 // Flags for parsers
 //    constant = true        -> what parser skips is always the same

@@ -49,8 +49,36 @@ class ParseMember {
 
 //////////////////////////////////////////////////////////////////////////////
 // factories
+export var nodeTypes = {}
+
+/// Create a new node or a reference to a currently existing or
+/// potential future existing node of a given type.
+/// @detail If node is called with a single parameter than a reference
+///         to the existing (or possible future existing) node is returned.
+///         If there are more parameters then a new node is created.
+/// @arg type string type of node
+/// @arg ...parsers optional parsers
 export function node(type, ...parsers) {
-  return new ParseNode(type, makeSeq(parsers))
+  var node = nodeTypes[type]
+  if (node) {
+    if (parsers.length === 0) {
+      // specific request for reference to this node
+      return node
+    }
+    else if (node.parser !== undefined) {
+      // already been called with arguments!
+      throw new Error("attempt to redefine node of type: " + node.type)
+    }
+    else {
+      // return referecene created by earlier request for reference to node.
+      node.parser = makeSeq(parsers)
+      return node
+    }
+  }
+
+  return (nodeTypes[type] =
+            new ParseNode(type,
+                          parsers.length ? makeSeq(parsers) : undefined))
 }
 
 export function member(name, ...parsers) {

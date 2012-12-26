@@ -1,29 +1,43 @@
 import makeSeq from './sequence'
 
 class ParseTreePlus {
+  constructor(parser) { this.parser = parser }
+
+  // TODO:
 }
 
 export function treePlus(...parsers) {
   return new ParseTreePlus(makeSeq(parsers))
 }
 
-export function treeJoinPlus(joinParser, ...parsers) {
-  return new ParseTreeJoin(false, joinParser, makeSeq(parsers))
+class ParseTreeJoin {
+  constructor(atLeastOne, joinParser, parser) {
+    this.atLeastOne = atLeastOne
+    this.joinParser = joinParser
+    this.parser = parser
+  }
+
+  // TODO:
 }
 
-class ParseTreeJoinPlus {
+//////////////////////////////////////////////////////////////////////////////
+export function treeJoinPlus(joinParser, ...parsers) {
+  return new ParseTreeJoin(false, joinParser, makeSeq(parsers))
 }
 
 export function treeJoinPlusLex(joinParser, ...parsers) {
   return new ParseTreeJoin(true, joinParser, makeSeq(parsers))
 }
 
+//////////////////////////////////////////////////////////////////////////////
 class ParseTreeOptional {
-  constructor(parser) {
-    this.parser = parser
-  }
+  constructor(parser) { this.parser = parser }
 }
 
 export function treeOptional(...parsers) {
   return new ParseTreeOptional(makeSeq(parsers))
+}
+
+export function treeSequence(...parsers) {
+  // TODO: look for treeOptional parser
 }

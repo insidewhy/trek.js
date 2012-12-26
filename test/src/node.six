@@ -23,4 +23,51 @@ describe("node parsing", () => {
 
     expect(ast[0].declarations[1].name).to.equal("kitten")
   })
+
+  it("can use nodes to create self-referential parsers.", () => {
+    var Num  = p.node("Num", p.member("value", p.plus(p.range("09")))),
+        expr = p.or(Num, p.sequence("(", p.node("Expression"), ")")),
+        mult = p.or(
+          p.node("Mult",
+                 p.member("left", expr), "*", p.member("right", expr)),
+          expr)
+
+    var grammar =
+      p.node("Expression", p.member("value", p.or(
+        p.node("Add", p.member("left", mult), "+", p.member("right", mult)),
+        mult)))
+
+    var ast = parse(grammar, "45 * (48 + 42)")
+    expect(ast).to.eql({
+      range: [ 0, 14 ],
+      type: "Expression",
+      value: {
+        range: [ 0, 14 ],
+        type: "Mult",
+        left: {
+          range: [ 0, 2 ],
+          type: "Num",
+          value: "45"
+        },
+        right: {
+          range: [ 6, 13 ],
+          type: "Expression",
+          value: {
+            range: [ 6, 13 ],
+            type: "Add",
+            left: {
+              range: [ 6, 8 ],
+              type: "Num",
+              value: "48"
+            },
+            right: {
+              range: [ 11, 13 ],
+              type: "Num",
+              value: "42"
+            }
+          }
+        }
+      }
+    })
+  })
 })
