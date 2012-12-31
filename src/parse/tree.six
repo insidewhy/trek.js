@@ -17,9 +17,7 @@ class ParseTreePlus {
     if (! newAst)
       return ast
 
-    var ret = []
-    ret.push(ast)
-
+    var ret = [ ast ]
     do {
       ret.push(newAst)
       stream.skipWhitespace()
@@ -44,13 +42,60 @@ class ParseTreePlus {
   }
 }
 
+class ParseTreePlusLex {
+  constructor(parser) { this.parser = parser }
+
+  parse(stream) {
+    var ast = this.parser.parse(stream)
+
+    if (! ast)
+      return null
+
+    if (stream.empty) return ast
+
+    var newAst = this.parser.parse(stream)
+    if (! newAst)
+      return ast
+
+    var ret = [ ast ]
+    do {
+      ret.push(newAst)
+      if (stream.empty) return ret
+    }
+    while (newAst = this.parser.parse(stream))
+
+    return ret
+  }
+
+  skip(stream) {
+    if (! this.parser.skip(stream))
+      return false
+
+    while (this.parser.skip(stream) && ! stream.empty) {}
+    return true
+  }
+}
+
 export function treePlus(...parsers) {
   return new ParseTreePlus(makeSeq(parsers))
 }
 
+export function treePlusLex(...parsers) {
+  return new ParseTreePlusLex(makeSeq(parsers))
+}
+
 class ParseTreeJoin {
-  constructor(atLeastOne, joinParser, parser) {
+  constructor(joinParser, parser) {
     this.atLeastOne = atLeastOne
+    this.joinParser = joinParser
+    this.parser = parser
+  }
+
+  // TODO:
+}
+
+class ParseTreeJoinLex {
+  constructor(joinParser, parser) {
     this.joinParser = joinParser
     this.parser = parser
   }
@@ -60,11 +105,11 @@ class ParseTreeJoin {
 
 //////////////////////////////////////////////////////////////////////////////
 export function treeJoinPlus(joinParser, ...parsers) {
-  return new ParseTreeJoin(false, joinParser, makeSeq(parsers))
+  return new ParseTreeJoin(joinParser, makeSeq(parsers))
 }
 
 export function treeJoinPlusLex(joinParser, ...parsers) {
-  return new ParseTreeJoin(true, joinParser, makeSeq(parsers))
+  return new ParseTreeJoinLex(joinParser, makeSeq(parsers))
 }
 
 //////////////////////////////////////////////////////////////////////////////
