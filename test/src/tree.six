@@ -1,6 +1,10 @@
 import {expect, p, parse, word} from "./helper"
 
 describe("tree parsing", () => {
-  it("treePlus(p) storing both p and a node", () => {
+  it("treePlus(p) storing both string and [string]", () => {
+    var grammar = p.treePlus(word)
+
+    expect(parse(grammar, "totoro")).to.equal("totoro")
+    expect(parse(grammar, "totoro friend")).to.eql(["totoro", "friend"])
   })
 })

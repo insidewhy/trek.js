@@ -17,15 +17,12 @@ class ParseMany {
     if (! ast)
       return this.atLeastOne ? null : []
 
-    ret.push(ast)
-    stream.skipWhitespace()
-    if (stream.empty) return ret
-
-    while (ast = this.parser.parse(stream)) {
+    do {
       ret.push(ast)
       stream.skipWhitespace()
       if (stream.empty) return ret
     }
+    while (ast = this.parser.parse(stream))
 
     return ret
   }
@@ -34,13 +31,11 @@ class ParseMany {
     if (! this.parser.skip(stream))
       return ! this.atLeastOne
 
-    stream.skipWhitespace()
-    if (stream.empty) return true
-
-    while (this.parser.skip(stream)) {
+    do {
       stream.skipWhitespace()
       if (stream.empty) return true
     }
+    while (this.parser.skip(stream))
 
     return true
   }

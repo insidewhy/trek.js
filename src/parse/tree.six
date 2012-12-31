@@ -3,7 +3,45 @@ import makeSeq from './sequence'
 class ParseTreePlus {
   constructor(parser) { this.parser = parser }
 
-  // TODO:
+  parse(stream) {
+    var ast = this.parser.parse(stream)
+
+    if (! ast)
+      return null
+
+    if (stream.empty) return ast
+
+    stream.skipWhitespace()
+
+    var newAst = this.parser.parse(stream)
+    if (! newAst)
+      return ast
+
+    var ret = []
+    ret.push(ast)
+
+    do {
+      ret.push(newAst)
+      stream.skipWhitespace()
+      if (stream.empty) return ret
+    }
+    while (newAst = this.parser.parse(stream))
+
+    return ret
+  }
+
+  skip(stream) {
+    if (! this.parser.skip(stream))
+      return false
+
+    do {
+      stream.skipWhitespace()
+      if (stream.empty) return true
+    }
+    while (this.parser.skip(stream))
+
+    return true
+  }
 }
 
 export function treePlus(...parsers) {
