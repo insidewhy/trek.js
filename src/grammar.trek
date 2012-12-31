@@ -12,8 +12,8 @@ Primary           <- String / CharacterRange / Escape / AnyCharacter /
                      ScopedRule / Identifier &! "<" / "(" Expression ")"
 Suffix            <= Primary ( "^+" / "^*" / [?*+] / "|+" / "|?" )|?
 Prefix            <= ( "&!" / "#+" / [&!#] )|? Suffix
-Join              <= Prefix ("^%" / "%+" / "%" / "|%" / "|^%") Prefix
-Joined            <= (Join / Prefix) |% "^"
+Join              <= Prefix (("^%" / "%+" / "%" / "|%" / "|^%") Prefix)|?
+Joined            <= Join |% "^"
 Sequence          <= Joined |+
 OrderedChoice     <= Sequence |% "/"
 Expression        <= OrderedChoice
