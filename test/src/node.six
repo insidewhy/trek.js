@@ -7,6 +7,7 @@ describe("node parsing", () => {
 
     expect(ast.name).to.equal("totoro")
     expect(ast.type).to.equal("Friend")
+    expect(ast.value).to.be.undefined
   })
 
   it("parses multiple layers of nodes.", () => {
@@ -25,6 +26,8 @@ describe("node parsing", () => {
   })
 
   it("can use nodes to create self-referential parsers.", () => {
+    // TODO: remove p.member("value", ) as this will be the default
+    //       for non-member/null storing node sub-parsers.
     var Num  = p.node("Num", p.member("value", integer)),
         expr = p.or(Num, p.sequence("(", p.node("Expression"), ")")),
         mult = p.or(

@@ -1,6 +1,5 @@
 import makeSeq from './sequence'
-
-export var Member = 4 // storage type ID
+import Member from './storage'
 
 // A node is a special type of AST element that can't be broken down by
 // grammar rules. It may include range information.
@@ -21,8 +20,15 @@ export class Node {
 class ParseNode {
   constructor(type, parser) {
     this.type = type
-    this.parser = parser
+    if (parser)
+      this.setParser(parser)
     this.stores = Node
+  }
+
+  setParser(parser) {
+    // TODO: if parser does not store Member than redirect parse to
+    //       version that stores in "value" member
+    this.parser = parser
   }
 
   parse(stream) {
@@ -41,6 +47,7 @@ class ParseMember {
   constructor(name, parser) {
     this.name = name
     this.parser = parser
+    this.stores = Member
   }
 
   parse(stream) {
@@ -73,7 +80,7 @@ export function node(type, ...parsers) {
     }
     else {
       // return referecene created by earlier request for reference to node.
-      node.parser = makeSeq(parsers)
+      node.setParser(makeSeq(parsers))
       return node
     }
   }

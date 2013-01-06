@@ -1,9 +1,8 @@
 import {Char, whitespace} from './char'
 import {ParseString, makeParser, StoresString} from './string'
+import {Tuple, Member} from './storage'
 
 module _ = 'underscore'
-
-export var Tuple = 2 // storage type ID
 
 //////////////////////////////////////////////////////////////////////////////
 // lexeme
@@ -34,6 +33,12 @@ class ParseLexeme {
       }
       else if (p.stores === Tuple) {
         this.tupleSize += p.tupleSize
+        return (stream, ast) => null !== p.parse(stream, ast)
+      }
+      else if (p.stores === Member) {
+        if (! this.stores)
+          this.stores = Member
+
         return (stream, ast) => null !== p.parse(stream, ast)
       }
       else {
