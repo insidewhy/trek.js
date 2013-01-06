@@ -1,5 +1,7 @@
 import makeSeq from './sequence'
 
+export var Member = 4 // storage type ID
+
 // A node is a special type of AST element that can't be broken down by
 // grammar rules. It may include range information.
 export class Node {

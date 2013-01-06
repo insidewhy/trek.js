@@ -2,7 +2,7 @@ module _ = 'underscore'
 import Char from './char'
 import makeParser from './string'
 
-export var Variant = 3
+export var Variant = 3 // storage type ID
 
 class ParseOr {
   constructor(choices) {

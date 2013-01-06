@@ -5,6 +5,7 @@ describe("sequence", () => {
     var grammar = p.sequence(word, word),
         ast     = parse(grammar, "mr hammer")
 
+    expect(grammar.stores).to.equal(p.Tuple)
     expect(ast).to.eql(["mr", "hammer"])
   })
 
@@ -12,6 +13,7 @@ describe("sequence", () => {
     var grammar = p.sequence(word, p.sequence(word, word)),
         ast     = parse(grammar, "we love totoro")
 
+    expect(grammar.stores).to.equal(p.Tuple)
     expect(ast).to.eql(["we", "love", "totoro"])
   })
 
@@ -19,6 +21,7 @@ describe("sequence", () => {
     var grammar = p.sequence("var", word),
         ast     = parse(grammar, "var kitten")
 
+    expect(grammar.stores).to.equal(String)
     expect(ast).to.eql("kitten")
   })
 })

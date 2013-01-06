@@ -3,7 +3,7 @@ import {ParseString, makeParser, StoresString} from './string'
 
 module _ = 'underscore'
 
-export var Tuple = 2
+export var Tuple = 2 // storage type ID
 
 //////////////////////////////////////////////////////////////////////////////
 // lexeme
@@ -26,16 +26,24 @@ class SkipParsers extends StoresString {
 
 class ParseLexeme {
   constructor(parsers) {
-    this.stores = Tuple
+    this.tupleSize = 0
 
     this.parsers = parsers.map(p => {
       if (p.stores === null) {
         return (stream, ast) => p.skip(stream)
       }
       else if (p.stores === Tuple) {
+        this.tupleSize += p.tupleSize
         return (stream, ast) => null !== p.parse(stream, ast)
       }
       else {
+        ++this.tupleSize
+
+        if (! this.stores) {
+          // in case it is the only storage
+          this.stores = p.stores
+        }
+
         return (stream, ast) => {
           var ret
           if (ret = p.parse(stream)) {
@@ -46,6 +54,10 @@ class ParseLexeme {
         }
       }
     })
+
+    if (this.tupleSize > 1)
+      this.stores = Tuple
+    // else already set earlier
 
     this.skippers = parsers.map(p => stream => p.skip(stream))
   }
