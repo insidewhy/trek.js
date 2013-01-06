@@ -46,7 +46,7 @@ class ParseLexeme {
 
         // if it is the only storing parser then propogate to the
         // sequence otherwise it'll be overridden later in this method
-        if (! this.stores)
+        if (! this.stores || this.stores === Member)
           this.stores = p.stores
 
         return (stream, ast) => {
