@@ -42,4 +42,14 @@ describe("repetition parsers", () => {
 
     expect(ast).to.eql(["barneys", "lounge"])
   })
+
+  it("joinLex(char, string) restores stream before join state.", () => {
+    var grammar = p.sequence(
+      p.join(",", word),
+      p.lexeme(",", p.plus(p.range("09"))))
+
+    var ast     = parsePartial(grammar, "aw,my,102")
+
+    expect(ast).not.to.be.null
+  })
 })
