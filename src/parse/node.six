@@ -1,5 +1,5 @@
 import makeSeq from './sequence'
-import Member from './storage'
+import {Member, Variant} from './storage'
 
 // A node is a special type of AST element that can't be broken down by
 // grammar rules. It may include range information.
@@ -48,11 +48,32 @@ class ParseMember {
     this.name = name
     this.parser = parser
     this.stores = Member
+
+    if (this.parser.stores === Variant)
+      this.parse = this.parseVariant
+  }
+
+  parseVariant(stream) {
+    var ast = this.parser.parse(stream)
+    if (ast) {
+      if (ast !== Member)
+        stream.node[this.name] = ast
+
+      return Member
+    }
+    else return null
   }
 
   parse(stream) {
+    // optimised for when subparser cannot store Member although
+    // currently only test via Variant... doesn't probe into possible
+    // variant values.
     var ast = this.parser.parse(stream)
-    return ast && (stream.node[this.name] = ast)
+    if (ast) {
+      stream.node[this.name] = ast
+      return Member
+    }
+    else return null
   }
 }
 

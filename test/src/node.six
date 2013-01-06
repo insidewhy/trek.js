@@ -25,6 +25,15 @@ describe("node parsing", () => {
     expect(ast[0].declarations[1].name).to.equal("kitten")
   })
 
+  it("can use nested members", () => {
+    var grammar = p.plus(p.node("Function",
+      p.member("name", "fun", p.or(word, p.member("number", integer))))),
+        ast     = parse(grammar, "fun friend fun 420")
+
+    expect(ast[1].number).to.equal("420")
+    expect(ast[1].name).to.be.undefined
+  })
+
   it("can use nodes to create self-referential parsers.", () => {
     // TODO: remove p.member("value", ) as this will be the default
     //       for non-member/null storing node sub-parsers.
