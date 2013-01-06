@@ -97,35 +97,56 @@ class ParseJoin {
       return this.atLeastOne ? null : []
 
     ret.push(ast)
+    var restore = stream.idx
     stream.skipWhitespace()
-    if (stream.empty || ! this.joinParser.skip(stream)) return ret
+    if (stream.empty || ! this.joinParser.skip(stream)) {
+      stream.idx = restore
+      return ret
+    }
     stream.skipWhitespace()
 
-    while (ast = this.parser.parse(stream)) {
+    for (;;) {
+      if (! (ast = this.parser.parse(stream))) {
+        stream.idx = restore
+        return ret
+      }
       ret.push(ast)
+      restore = stream.idx
       stream.skipWhitespace()
-      if (stream.empty || ! this.joinParser.skip(stream)) return ret
+      if (stream.empty || ! this.joinParser.skip(stream)) {
+        stream.idx = restore
+        return ret
+      }
       stream.skipWhitespace()
     }
-
-    return ret
   }
 
   skip(stream) {
     if (! this.parser.skip(stream))
       return this.atLeastOne ? true : false
 
+    var restore = stream.idx
     stream.skipWhitespace()
-    if (stream.empty || ! this.joinParser.skip(stream)) return true
+    if (stream.empty || ! this.joinParser.skip(stream)) {
+      stream.idx = restore
+      return true
+    }
     stream.skipWhitespace()
 
-    while (this.parser.skip(stream)) {
+    for (;;) {
+      if (! this.parser.skip(stream)) {
+        stream.idx = restore
+        return true
+      }
+
+      restore = stream.idx
       stream.skipWhitespace()
-      if (stream.empty || ! this.joinParser.skip(stream)) return true
+      if (stream.empty || ! this.joinParser.skip(stream)) {
+        stream.idx = restore
+        return true
+      }
       stream.skipWhitespace()
     }
-
-    return true
   }
 }
 
@@ -144,27 +165,54 @@ class ParseJoinLex {
       return this.atLeastOne ? null : []
 
     ret.push(ast)
-    if (stream.empty || ! this.joinParser.skip(stream)) return ret
+    if (stream.empty)
+     return ret
 
-    while (ast = this.parser.parse(stream)) {
+    var restore = stream.idx
+    if (! this.joinParser.skip(stream))
+      return ret
+
+    for (;;) {
+      if (! (ast = this.parser.parse(stream))) {
+        stream.idx = restore
+        return ret
+      }
       ret.push(ast)
-      if (stream.empty || ! this.joinParser.skip(stream)) return ret
-    }
+      if (stream.empty)
+        return ret
 
-    return ret
+      // does not have to restore on join failure here unlike non-lex
+      // version where the whitespace must be reversed.
+      restore = stream.idx
+      if (! this.joinParser.skip(stream))
+        return ret
+    }
   }
 
   skip(stream) {
     if (! this.parser.skip(stream))
       return ! this.atLeastOne
 
-    if (stream.empty || ! this.joinParser.skip(stream)) return true
+    if (stream.empty)
+     return true
 
-    while (this.parser.skip(stream)) {
-      if (stream.empty || ! this.joinParser.skip(stream)) return true
+    var restore = stream.idx
+    if (! this.joinParser.skip(stream))
+      return true
+
+    for (;;) {
+      if (! this.parser.skip(stream)) {
+        stream.idx = restore
+        return true
+      }
+      if (stream.empty)
+        return true
+
+      restore = stream.idx
+
+      if (! this.joinParser.skip(stream))
+        return true
     }
-
-    return true
   }
 }
 

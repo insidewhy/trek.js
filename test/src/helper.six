@@ -5,6 +5,7 @@ export p, expect
 
 export var spacing = p.star(p.char(" \n\r\t")),
            word    = p.plus(p.range("az")),
+           integer = p.plus(p.range("09")),
            parse   = (grammar, src) => {
              p.grammar()
              var stream = p.stream(spacing),

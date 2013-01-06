@@ -1,4 +1,4 @@
-import {expect, p, parse, parsePartial, word} from "./helper"
+import {expect, p, parse, parsePartial, word, integer} from "./helper"
 
 describe("repetition parsers", () => {
   it("plus(characterRange) stores a string.", () => {
@@ -16,14 +16,14 @@ describe("repetition parsers", () => {
   })
 
   it("plus(string) stores a list of strings.", () => {
-    var grammar = p.plus(p.or(word, p.plus(p.range("09")))),
+    var grammar = p.plus(p.or(word, integer)),
         ast     = parse(grammar, "my friend420   totoro")
 
     expect(ast).to.eql(["my", "friend", "420", "totoro"])
   })
 
   it("plusLex(string) stores a string.", () => {
-    var grammar = p.plusLex(p.or(word, p.plus(p.range("09")))),
+    var grammar = p.plusLex(p.or(word, integer)),
         ast     = parsePartial(grammar, "friend420isgood ohyeah")
 
     expect(ast).to.equal("friend420isgood")
@@ -43,10 +43,20 @@ describe("repetition parsers", () => {
     expect(ast).to.eql(["barneys", "lounge"])
   })
 
-  it("joinLex(char, string) restores stream before join state.", () => {
+  it("join(char, string) restores stream before join state.", () => {
     var grammar = p.sequence(
       p.join(",", word),
-      p.lexeme(",", p.plus(p.range("09"))))
+      p.lexeme(",", integer))
+
+    var ast     = parsePartial(grammar, "aw , my,102")
+
+    expect(ast).not.to.be.null
+  })
+
+  it("joinLexeme(char, string) restores stream before join state.", () => {
+    var grammar = p.sequence(
+      p.joinLex(",", word),
+      p.lexeme(",", integer))
 
     var ast     = parsePartial(grammar, "aw,my,102")
 
