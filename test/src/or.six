@@ -1,4 +1,4 @@
-import {expect, p, parse, parsePartial, word} from "./helper"
+import {expect, p, parse, parsePartial, word, integer} from "./helper"
 
 describe("or parser", () => {
   it("using or() over many char storing parsers, stores a char", () => {
@@ -15,9 +15,7 @@ describe("or parser", () => {
   })
 
   it("using or() over String and node parser to return varying type.", () => {
-    var grammar = p.or(
-      p.node("Friend", p.member("name", word)),
-      p.plus(p.range("09")))
+    var grammar = p.or(p.node("Friend", p.member("name", word)), integer)
 
     expect(grammar.stores).to.equal(p.Variant)
 
@@ -28,7 +26,7 @@ describe("or parser", () => {
   })
 
   it("using or() over string and constant string.", () => {
-    var grammar = p.or(p.range("09"), "Chindor"),
+    var grammar = p.or(integer, "Chindor"),
         ast = parse(grammar, "Chindor")
 
     expect(ast).to.equal("Chindor")
@@ -38,7 +36,7 @@ describe("or parser", () => {
   })
 
   it("using or() over string and constant character.", () => {
-    var grammar = p.or(p.range("09"), "c")
+    var grammar = p.or(integer, "c")
 
     expect(parse(grammar, "c")).to.equal("c")
     expect(parse(grammar, "9")).to.equal("9")

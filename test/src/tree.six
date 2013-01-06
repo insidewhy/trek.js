@@ -1,4 +1,4 @@
-import {expect, p, parse, parsePartial, word} from "./helper"
+import {expect, p, parse, parsePartial, word, integer} from "./helper"
 
 describe("tree parsing", () => {
   it("treePlus(p) storing both string and [string]", () => {
@@ -9,7 +9,7 @@ describe("tree parsing", () => {
   })
 
   it("treePlusLex(p) storing both string and [string]", () => {
-    var grammar = p.treePlusLex(p.lexeme(word, p.range("09")))
+    var grammar = p.treePlusLex(p.lexeme(word, integer))
 
     expect(parse(grammar, "james4")).to.equal("james4")
     expect(parsePartial(grammar, "j1a5 b9")).to.eql(["j1", "a5"])
