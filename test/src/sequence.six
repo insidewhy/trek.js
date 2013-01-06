@@ -6,6 +6,7 @@ describe("sequence", () => {
         ast     = parse(grammar, "mr hammer")
 
     expect(grammar.stores).to.equal(p.Tuple)
+    expect(grammar.tupleSize).to.equal(2)
     expect(ast).to.eql(["mr", "hammer"])
   })
 
@@ -14,6 +15,7 @@ describe("sequence", () => {
         ast     = parse(grammar, "we love totoro")
 
     expect(grammar.stores).to.equal(p.Tuple)
+    expect(grammar.tupleSize).to.equal(3)
     expect(ast).to.eql(["we", "love", "totoro"])
   })
 
