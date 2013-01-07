@@ -26,12 +26,14 @@ describe("node parsing", () => {
   })
 
   it("can use nested members", () => {
-    var grammar = p.plus(p.node("Function",
+    var grammar = p.plus(p.node("Fun",
       p.member("name", "fun", p.or(word, p.member("number", integer))))),
         ast     = parse(grammar, "fun friend fun 420")
 
-    expect(ast[1].number).to.equal("420")
-    expect(ast[1].name).to.be.undefined
+    expect(ast).to.eql([
+      { type: "Fun", name: "friend", range: [0, 10] },
+      { type: "Fun", number: "420", range: [11, 18] }
+    ])
   })
 
   it("can use nodes to create self-referential parsers.", () => {
