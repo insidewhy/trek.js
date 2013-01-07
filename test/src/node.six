@@ -37,9 +37,8 @@ describe("node parsing", () => {
   })
 
   it("can use nodes to create self-referential parsers.", () => {
-    // TODO: remove p.member("value", ) as this will be the default
-    //       for non-member/null storing node sub-parsers.
-    var Num  = p.node("Num", p.member("value", integer)),
+    // integer === p.member("value", integer)
+    var Num  = p.node("Num", integer),
         expr = p.or(Num, p.sequence("(", p.node("Expression"), ")")),
         mult = p.or(
           p.node("Mult",
@@ -47,9 +46,9 @@ describe("node parsing", () => {
           expr)
 
     var grammar =
-      p.node("Expression", p.member("value", p.or(
+      p.node("Expression", p.or(
         p.node("Add", p.member("left", mult), "+", p.member("right", mult)),
-        mult)))
+        mult))
 
     var ast = parse(grammar, "45 * (48 + 42)")
     expect(ast).to.eql({

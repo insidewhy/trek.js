@@ -28,7 +28,7 @@ class ParseNode {
   setParser(parser) {
     // TODO: if parser does not store Member than redirect parse to
     //       version that stores in "value" member
-    this.parser = parser
+    this.parser = parser.stores === Member ? parser : member("value", parser)
   }
 
   parse(stream) {
