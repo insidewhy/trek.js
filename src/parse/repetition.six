@@ -12,32 +12,37 @@ class ParseMany {
 
   parse(stream) {
     var ret = [],
-        ast = this.parser.parse(stream)
+        ast = this.parser.parse(stream),
+        restore
 
     if (! ast)
       return this.atLeastOne ? null : []
 
-    do {
+    for (;;) {
       ret.push(ast)
+      restore = stream.idx
       stream.skipWhitespace()
-      if (stream.empty) return ret
+      if (stream.empty || ! (ast = this.parser.parse(stream))) {
+        stream.idx = restore
+        return ret
+      }
     }
-    while (ast = this.parser.parse(stream))
-
-    return ret
   }
 
   skip(stream) {
+    var restore
+
     if (! this.parser.skip(stream))
       return ! this.atLeastOne
 
-    do {
+    for (;;) {
+      restore = stream.idx
       stream.skipWhitespace()
-      if (stream.empty) return true
+      if (stream.empty || ! this.parser.skip(stream)) {
+        stream.idx = restore
+        return true
+      }
     }
-    while (this.parser.skip(stream))
-
-    return true
   }
 }
 
