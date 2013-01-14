@@ -1,6 +1,6 @@
 import ParseConstantChar from './char'
 
-class StoresString {
+export class StoresString {
   constructor() {
     this.stores = String
   }
@@ -15,7 +15,7 @@ class StoresString {
   }
 }
 
-class ParseConstant {
+export class ParseConstant {
   constructor(value) {
     this.skips = String
     this.stores = null
@@ -37,8 +37,6 @@ class ParseConstant {
     return this.skip(stream) ?  this.value : null
   }
 }
-
-export StoresString, ParseConstant
 
 // If obj is a string then return a constant parser, else return the
 // parser unchanged.

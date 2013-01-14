@@ -1,7 +1,7 @@
 export var Char = 1
 
 // TODO: export classes directly - see https://github.com/ariya/esprima/pull/130
-class StoresChar {
+export class StoresChar {
   constructor() {
     this.stores = Char
   }
@@ -23,7 +23,7 @@ class StoresChar {
   }
 }
 
-class ParseConstantChar {
+export class ParseConstantChar {
   constructor(ch) {
     this.value = ch
     this.stores = null
@@ -42,8 +42,6 @@ class ParseConstantChar {
     return this.skip(stream) ? this.value : null
   }
 }
-
-export StoresChar, ParseConstantChar
 
 class ParseRange extends StoresChar {
   constructor(range) {

@@ -3,7 +3,7 @@ import {Member, Variant} from './storage'
 
 // A node is a special type of AST element that can't be broken down by
 // grammar rules. It may include range information.
-export class Node {
+class Node {
   constructor(stream, type) {
     this.range = [ stream.idx ]
     this.type = type
