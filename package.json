@@ -8,7 +8,7 @@
   },
   "version": "0.3.0",
   "dependencies": {
-    "six-jpike": "0.0.13",
+    "six-jpike": "0.0.15",
     "commander": "1.0.5",
     "underscore": "1.4.2"
   },
