@@ -39,3 +39,8 @@ IdFirst         <- [a-z$_]
 Identifier      <- IdFirst ^ (IdFirst / [0-9])*
 ManyIdentifiers <- Identifier+
 ```
+
+# TODO
+* Test for tree optional
+* Tree join
+* Bootstrap grammar compiler

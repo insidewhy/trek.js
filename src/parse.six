@@ -9,7 +9,9 @@ import {plus, plusLex, star, starLex, join,
         joinLex, joinPlus, joinPlusLex} from './parse/repetition'
 import or from './parse/or'
 import {test, testNot, not} from './parse/predicate'
-import {treePlus, treePlusLex, treeJoin, treeJoinLex, treeOptional} from './parse/tree'
+import {treePlus, treePlusLex,
+        treeJoin, treeJoinLex,
+        treeSequence, treeOptional} from './parse/tree'
 import grammar from './parse/grammar'
 
 //////////////////////////////////////////////////////////////////////////////
@@ -22,7 +24,9 @@ export stream,
        plus, plusLex, star, starLex, join, joinLex, joinPlus, joinPlusLex,
        or,
        test, testNot, not,
-       treePlus, treePlusLex, treeJoin, treeJoinLex, treeOptional,
+       treePlus, treePlusLex,
+       treeJoin, treeJoinLex,
+       treeSequence, treeOptional,
        grammar
 
 // Flags for parsers

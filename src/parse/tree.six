@@ -1,4 +1,5 @@
 import makeSeq from './sequence'
+import or from './or'
 
 class ParseTreePlus {
   constructor(parser) { this.parser = parser }
@@ -121,6 +122,25 @@ export function treeOptional(...parsers) {
   return new ParseTreeOptional(makeSeq(parsers))
 }
 
+class ParseTreeSequence {
+  constructor(parsers) {
+    var withOptional = parsers.map(parser =>
+      (parser instanceof ParseTreeOptional) ? parser.parser : parser)
+
+    var withoutOptional = parsers.filter(
+      parser => ! (parser instanceof ParseTreeOptional))
+
+    this.parser = or(makeSeq(withOptional), makeSeq(withoutOptional))
+  }
+
+  get withOptional()    { return this.parser.choices[0] }
+  get withoutOptional() { return this.parser.choices[1] }
+
+  skip(stream)  { return this.parser.skip(stream) }
+  parse(stream) { return this.parser.parse(stream) }
+}
+
+
 export function treeSequence(...parsers) {
-  // TODO: look for treeOptional parser
+  return new ParseTreeSequence(parsers)
 }

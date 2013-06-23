@@ -14,4 +14,10 @@ describe("tree parsing", () => {
     expect(parse(grammar, "james4")).to.equal("james4")
     expect(parsePartial(grammar, "j1a5 b9")).to.eql(["j1", "a5"])
   })
+
+  it("treeSequence(treeOptional(q), p) storing both string and [string]", () => {
+    var grammar = p.treeSequence(p.treeOptional(integer), word)
+    expect(parse(grammar, "123 poop")).to.eql(['123', 'poop'])
+    expect(parse(grammar, "poop")).to.equal('poop')
+  })
 })
